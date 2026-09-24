@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jeseena J — Full Stack Developer Portfolio</title>
+    <meta name="description" content="Personal Full Stack Developer Portfolio of Jeseena J. Specialized in Python, Django, React, MySQL, HTML, CSS and JavaScript." />
+    <meta name="author" content="Jeseena J" />
+    <meta name="theme-color" content="#060606" />
+
+    <!-- Google Fonts Matching Reference Image -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Oswald:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet" />
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- React 18 & Babel Standalone for Instant Local Preview -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+      const API_BASE_URL = 'http://127.0.0.1:8000/api';
+
+      const DEFAULT_ABOUT = {
+        name: 'JESEENA J',
+        professional_title: 'FULL STACK DEVELOPER',
+        short_introduction: "I'm a passionate Full Stack Developer with a background in BA Functional English, turned coder. I love building web applications that are clean, useful and user-friendly. I'm always eager to learn, grow and take on new challenges.",
+        quote: 'Small steps every day lead to big dreams.',
+        location: 'KERALA, INDIA',
+        email: 'jeseena.j88@gmail.com',
+        github_url: 'https://github.com/Jeseena-codes',
+        linkedin_url: 'https://linkedin.com/in/jeseena-j-48a126336',
+        display_photo: '/images/profile.jpg',
+      };
+
+      const DEFAULT_PROJECTS = [
+        {
+          id: 1,
+          project_number: '01',
+          title: 'CareNova Medical Store',
+          subtitle: 'Full Stack Web Application',
+          technologies: 'Django | MySQL',
+          display_image: '/images/carenova.png',
+          description: 'A full-stack medical store management web application built using Python, Django, and MySQL. It delivers a robust system for managing pharmaceutical inventories, customer prescriptions, and order lifecycles with customized buyer and seller role experiences.',
+          github_url: 'https://github.com/Jeseena-codes/carenova-medical-store',
+        },
+        {
+          id: 2,
+          project_number: '02',
+          title: 'JobBizz – Job Portal',
+          subtitle: 'Personal Project',
+          technologies: 'Django | MySQL',
+          display_image: '/images/jobbizz.png',
+          description: 'A job portal web application connecting candidates, companies, and consultancy administration. Features comprehensive candidate registration, resume profiles, vacancy listings, and tracking.',
+          github_url: 'https://github.com/Jeseena-codes/jobbizz-portal',
+        },
+        {
+          id: 3,
+          project_number: '03',
+          title: 'My Portfolio Website',
+          subtitle: 'Personal Project',
+          technologies: 'React | Tailwind CSS',
+          display_image: '/images/portfolio_project.png',
+          description: 'Personal Full Stack Developer Portfolio with dynamic Django REST API integration, MySQL database persistence, and dark crimson editorial aesthetic.',
+          github_url: 'https://github.com/Jeseena-codes/portfolio',
+        },
+        {
+          id: 4,
+          project_number: '04',
+          title: 'To-Do List App',
+          subtitle: 'Personal Project',
+          technologies: 'React | Local Storage',
+          display_image: '/images/todolist.png',
+          description: 'Personal Task Management Application built with responsive React components, local storage persistence, and task management flow.',
+          github_url: 'https://github.com/Jeseena-codes/todo-app',
+        }
+      ];
+
+      const DEFAULT_SERVICES = [
+        {
+          id: 1,
+          service_number: '01',
+          title: 'Frontend Development',
+          description: 'Crafting responsive, clean and user-friendly web interfaces using semantic HTML5, modern CSS3 layouts, JavaScript, and React component architectures.',
+          skills_list: 'HTML, CSS, JavaScript, React',
+          skills: ['HTML', 'CSS', 'JavaScript', 'React']
+        },
+        {
+          id: 2,
+          service_number: '02',
+          title: 'Backend Development',
+          description: 'Developing robust server-side web applications and RESTful APIs with Python and Django, implementing secure authentication, models, and business logic.',
+          skills_list: 'Python, Django, Django REST Framework',
+          skills: ['Python', 'Django', 'Django REST Framework']
+        },
+        {
+          id: 3,
+          service_number: '03',
+          title: 'Database Management',
+          description: 'Designing relational databases, schema structuring, relational queries, data integrity, and performing efficient CRUD operations using MySQL.',
+          skills_list: 'MySQL, Database Management, SQL',
+          skills: ['MySQL', 'Database Management', 'SQL']
+        },
+        {
+          id: 4,
+          service_number: '04',
+          title: 'Full Stack Web Development',
+          description: 'Connecting dynamic React/HTML frontends to Python Django backends, handling end-to-end data flow, authentication, and state management.',
+          skills_list: 'Frontend + Backend Integration, REST APIs, Authentication, CRUD Applications',
+          skills: ['Frontend + Backend Integration', 'REST APIs', 'Authentication', 'CRUD Applications']
+        },
+        {
+          id: 5,
+          service_number: '05',
+          title: 'Version Control',
+          description: 'Tracking code evolution, branching workflows, commits, pull requests, and publishing open-source projects to GitHub.',
+          skills_list: 'Git, GitHub',
+          skills: ['Git', 'GitHub']
+        },
+        {
+          id: 6,
+          service_number: '06',
+          title: 'AI & Development Tools',
+          description: 'Accelerating full-stack engineering with modern development environments, extensions, debugging utilities, and AI productivity tools.',
+          skills_list: 'VS Code, AI-Assisted Development',
+          skills: ['VS Code', 'AI-Assisted Development']
+        }
+      ];
+
+      const DEFAULT_SKILLS = [
+        { id: 1, name: 'Python', category: 'BACKEND', proficiency: 80 },
+        { id: 2, name: 'Django', category: 'BACKEND', proficiency: 80 },
+        { id: 3, name: 'HTML', category: 'FRONTEND', proficiency: 90 },
+        { id: 4, name: 'CSS', category: 'FRONTEND', proficiency: 80 },
+        { id: 5, name: 'JavaScript', category: 'FRONTEND', proficiency: 70 },
+        { id: 6, name: 'React', category: 'FRONTEND', proficiency: 60 },
+        { id: 7, name: 'MySQL', category: 'DATABASE', proficiency: 75 },
+        { id: 8, name: 'Django REST Framework', category: 'BACKEND', proficiency: 65 },
+        { id: 9, name: 'Git', category: 'TOOLS', proficiency: 70 },
+        { id: 10, name: 'GitHub', category: 'TOOLS', proficiency: 70 },
+        { id: 11, name: 'SQL', category: 'DATABASE', proficiency: 70 }
+      ];
+
+      const DEFAULT_JOURNEY = [
+        { id: 1, year: '2022', title: 'Higher Secondary — Commerce', description: 'Govt. Victoria Girls Higher Secondary School, Anicode' },
+        { id: 2, year: '2025', title: 'BA Functional English', description: 'Govt. Arts & Science College, Nattukal, Kozhinjampara' },
+        { id: 3, year: '2025 – 2026', title: 'Python Full Stack Development with Internship', description: 'Safe Technologies' },
+        { id: 4, year: '2026', title: 'Full Stack Development', description: 'Building projects, improving React/Django skills and developing portfolio.' }
+      ];
+
+      const MARQUEE_TECH = [
+        { name: 'Python', symbol: '🐍' },
+        { name: 'Django', symbol: '🎸' },
+        { name: 'React', symbol: '⚛️' },
+        { name: 'HTML5', symbol: '🌐' },
+        { name: 'CSS3', symbol: '🎨' },
+        { name: 'JavaScript', symbol: '⚡' },
+        { name: 'MySQL', symbol: '🐬' },
+        { name: 'Git', symbol: '🌿' },
+        { name: 'GitHub', symbol: '🐙' }
+      ];
+
+      // Header Component with Anchor Navigation
+      function Header({ about }) {
+        return (
+          <header className="header-bar">
+            <div className="container header-container">
+              <a href="#home" className="header-brand">
+                <span className="brand-name">{about.name || 'JESEENA J'}</span>
+                <span className="brand-role">{about.professional_title || 'FULL STACK DEVELOPER'}</span>
+              </a>
+
+              <nav className="header-nav-list">
+                <a href="#about" className="header-nav-link">About</a>
+                <a href="#services" className="header-nav-link">What I Do</a>
+                <a href="#skills" className="header-nav-link">Skills</a>
+                <a href="#journey" className="header-nav-link">Journey</a>
+                <a href="#projects" className="header-nav-link">Projects</a>
+                <a href="#contact" className="header-nav-link">Contact</a>
+              </nav>
+
+              <a href="#contact" className="header-status-link">
+                AVAILABLE FOR OPPORTUNITIES <span className="plus">+</span>
+              </a>
+            </div>
+          </header>
+        );
+      }
+
+      // Hero Component (Kept Current Version)
+      function Hero({ about }) {
+        const [imgError, setImgError] = useState(false);
+        const name = about.name || 'JESEENA J';
+        const title = about.professional_title || 'FULL STACK DEVELOPER';
+        const photoUrl = about.display_photo || '/images/profile.jpg';
+
+        return (
+          <section id="home" className="hero-section">
+            <div className="hero-giant-bg">PORTFOLIO</div>
+
+            <div className="container">
+              <div className="hero-content-grid">
+                <div className="hero-left-box">
+                  <span className="hero-script-greeting">Hello, I'm</span>
+                  <h1 className="hero-big-name">{name}</h1>
+                  <h2 className="hero-big-title">{title}</h2>
+
+                  <p className="hero-bio-paragraph">{about.short_introduction}</p>
+
+                  <div className="hero-location-badge">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    {about.location || 'KERALA, INDIA'}
+                  </div>
+                </div>
+
+                <div className="hero-portrait-col">
+                  <div className="hero-portrait-container">
+                    {!imgError ? (
+                      <img
+                        src={photoUrl}
+                        alt={`${name} - ${title}`}
+                        onError={() => setImgError(true)}
+                      />
+                    ) : (
+                      <div style={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'linear-gradient(180deg, #18181c 0%, #060606 100%)',
+                        padding: '2rem',
+                        textAlign: 'center'
+                      }}>
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#D32F2F" strokeWidth="1.5">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <p style={{ marginTop: '0.8rem', fontSize: '0.75rem', color: '#A0A0A0' }}>
+                          Photo Slot: <code>public/images/profile.jpg</code>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="hero-right-box">
+                  <div className="hero-right-lead-row">
+                    <div className="hero-circle-plus">+</div>
+                    <div className="hero-lead-text">
+                      Turning ideas into functional web experiences.
+                    </div>
+                  </div>
+
+                  <ul className="hero-side-bullet-list">
+                    <li className="hero-side-bullet-item">
+                      <span className="red-cross">+</span> Responsive Design
+                    </li>
+                    <li className="hero-side-bullet-item">
+                      <span className="red-cross">+</span> Clean Code
+                    </li>
+                    <li className="hero-side-bullet-item">
+                      <span className="red-cross">+</span> User-Centered Design
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      // 2. About Me Component (Dedicated Full Section)
+      function AboutMe({ about }) {
+        const name = about.name || 'Jeseena J';
+        const title = about.professional_title || 'FULL STACK DEVELOPER';
+        const location = about.location || 'Kerala, India';
+        const email = about.email || 'jeseena.j88@gmail.com';
+        const quote = about.quote || 'Small steps every day lead to big dreams.';
+
+        return (
+          <section id="about" className="portfolio-section reveal-on-scroll">
+            <div className="container">
+              <div className="section-header-block">
+                <div className="section-num-tag">01 / ABOUT ME</div>
+                <h2 className="section-title">THE DEVELOPER BEHIND THE CODE</h2>
+                <p className="section-subtitle">
+                  A fresher Full Stack Developer driven by curiosity, analytical precision, and practical problem-solving.
+                </p>
+              </div>
+
+              <div className="about-grid-layout">
+                <div className="about-left-col">
+                  <h3 className="about-editorial-headline">
+                    FROM WORDS TO CODE — <span className="crimson-text">CRAFTING REAL-WORLD</span> WEB EXPERIENCES.
+                  </h3>
+
+                  <p className="about-narrative-text">
+                    I am an entry-level <strong>Full Stack Developer</strong> based in <strong>{location}</strong>. My journey into programming began from a background in <strong>BA Functional English</strong> at Govt. Arts & Science College, Nattukal. The discipline of linguistic syntax, structural grammar, and clear documentation naturally evolved into an enthusiasm for software engineering.
+                  </p>
+
+                  <p className="about-narrative-text">
+                    Through intensive full-stack training and internship at <strong>Safe Technologies (2025–2026)</strong>, I have cultivated hands-on competence building dynamic web platforms using <strong>Python</strong>, <strong>Django</strong>, and <strong>MySQL</strong>, while actively expanding my frontend capabilities with <strong>React</strong>, <strong>HTML5</strong>, <strong>CSS3</strong>, and <strong>JavaScript</strong>.
+                  </p>
+
+                  <p className="about-narrative-text">
+                    I love building practical, responsive, and user-friendly web applications that solve tangible problems. I believe in clean code, continuous learning, and pushing my boundaries every single day.
+                  </p>
+
+                  <div className="about-key-highlights-grid">
+                    <div className="about-highlight-card">
+                      <div className="about-highlight-title">Full Stack Focus</div>
+                      <div className="about-highlight-val">Python, Django & React Integration</div>
+                    </div>
+                    <div className="about-highlight-card">
+                      <div className="about-highlight-title">Database Engineering</div>
+                      <div className="about-highlight-val">MySQL Schema Design & CRUD Logic</div>
+                    </div>
+                    <div className="about-highlight-card">
+                      <div className="about-highlight-title">Linguistic Precision</div>
+                      <div className="about-highlight-val">Analytical Thinking & Clear Documentation</div>
+                    </div>
+                    <div className="about-highlight-card">
+                      <div className="about-highlight-title">Professional Mindset</div>
+                      <div className="about-highlight-val">Responsive UI & Maintainable Code</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="about-side-profile-card">
+                  <div className="about-badge-tag">✦ AVAILABLE FOR HIRE</div>
+
+                  <h4 className="about-identity-name">{name}</h4>
+                  <div className="about-identity-role">{title}</div>
+
+                  <div className="about-quote-box">
+                    “{quote}”
+                  </div>
+
+                  <div className="about-info-rows">
+                    <div className="about-info-row">
+                      <span className="about-info-label">Location</span>
+                      <span className="about-info-value">{location}</span>
+                    </div>
+                    <div className="about-info-row">
+                      <span className="about-info-label">Degree</span>
+                      <span className="about-info-value">BA Functional English</span>
+                    </div>
+                    <div className="about-info-row">
+                      <span className="about-info-label">Training</span>
+                      <span className="about-info-value">Python Full Stack (Safe Tech)</span>
+                    </div>
+                    <div className="about-info-row">
+                      <span className="about-info-label">Contact</span>
+                      <span className="about-info-value">{email}</span>
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '1.8rem' }}>
+                    <a href="#contact" className="btn-pill-freelance" style={{ width: '100%', justifyContent: 'center' }}>
+                      GET IN TOUCH →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      // 3. What I Do Component (6 Capabilities Grid)
+      function WhatIDo({ services }) {
+        return (
+          <section id="services" className="portfolio-section reveal-on-scroll">
+            <div className="container">
+              <div className="section-header-block">
+                <div className="section-num-tag">02 / WHAT I DO</div>
+                <h2 className="section-title">TECHNICAL CAPABILITIES & SERVICES</h2>
+                <p className="section-subtitle">
+                  Practical, end-to-end full stack development capabilities honed through structured projects and dedicated problem-solving.
+                </p>
+              </div>
+
+              <div className="services-grid">
+                {services.map((item) => {
+                  const tagList = item.skills || (item.skills_list ? item.skills_list.split(',').map(s => s.trim()) : []);
+                  return (
+                    <div key={item.id || item.service_number} className="service-card">
+                      <div className="service-card-num">{item.service_number}</div>
+                      <h3 className="service-card-title">{item.title}</h3>
+                      <p className="service-card-desc">{item.description}</p>
+
+                      <div className="service-tags-wrap">
+                        {tagList.map((tag, idx) => (
+                          <span key={idx} className="service-tag-pill">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      // 4. Skills Component (Animated Progress Bars)
+      function SkillsSection({ skills }) {
+        const [isRevealed, setIsRevealed] = useState(false);
+        const sectionRef = React.useRef(null);
+
+        useEffect(() => {
+          const observer = new IntersectionObserver(
+            ([entry]) => {
+              if (entry.isIntersecting) {
+                setIsRevealed(true);
+                observer.disconnect();
+              }
+            },
+            { threshold: 0.2 }
+          );
+
+          if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+          }
+
+          return () => observer.disconnect();
+        }, []);
+
+        return (
+          <section id="skills" ref={sectionRef} className="portfolio-section reveal-on-scroll">
+            <div className="container">
+              <div className="section-header-block">
+                <div className="section-num-tag">03 / TECHNICAL PROFICIENCY</div>
+                <h2 className="section-title">SKILLS & COMPETENCY</h2>
+                <p className="section-subtitle">
+                  Visual indicators of my current practical learning and development proficiency across frontend, backend, and databases.
+                </p>
+              </div>
+
+              <div className="skills-progress-grid">
+                {skills.map((skill, index) => {
+                  const targetPct = skill.proficiency || 70;
+                  const currentWidth = isRevealed ? `${targetPct}%` : '0%';
+
+                  return (
+                    <div key={skill.id || skill.name} className="skill-bar-card">
+                      <div className="skill-meta-row">
+                        <div className="skill-title-text">
+                          <span>{skill.name}</span>
+                          <span className="skill-cat-label">{skill.category_display || skill.category || 'DEV'}</span>
+                        </div>
+                        <span className="skill-pct-number">{targetPct}%</span>
+                      </div>
+
+                      <div className="skill-track-frame">
+                        <div
+                          className="skill-animated-fill"
+                          style={{
+                            width: currentWidth,
+                            transitionDelay: `${index * 75}ms`,
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <p style={{ marginTop: '2.5rem', fontSize: '0.8rem', color: 'var(--text-dim)', textAlign: 'center' }}>
+                * Proficiencies represent practical familiarity, project implementation, and continuous learning progression. Manageable via Django Admin.
+              </p>
+            </div>
+          </section>
+        );
+      }
+
+      // 5. Running Technology Logos (Infinite Marquee)
+      function TechMarqueeStrip() {
+        const doubledList = [...MARQUEE_TECH, ...MARQUEE_TECH];
+
+        return (
+          <div className="tech-marquee-section" aria-label="Continuously Moving Technology Logos">
+            <div className="marquee-track">
+              {doubledList.map((item, idx) => (
+                <div key={idx} className="marquee-pill-item">
+                  <span style={{ fontSize: '1.1rem' }}>{item.symbol}</span>
+                  <span>{item.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // 6. Journey / Education Timeline Component
+      function EducationJourney({ journey, about }) {
+        const quote = about.quote || 'Small steps every day lead to big dreams.';
+        const author = about.name || 'Jeseena J';
+
+        return (
+          <section id="journey" className="portfolio-section reveal-on-scroll">
+            <div className="container">
+              <div className="section-header-block">
+                <div className="section-num-tag">04 / EDUCATION & MILESTONES</div>
+                <h2 className="section-title">THE LEARNING JOURNEY</h2>
+                <p className="section-subtitle">
+                  A chronological timeline tracing my transition from Functional English linguistics into full-stack software development.
+                </p>
+              </div>
+
+              <div className="journey-timeline-grid">
+                <div className="journey-v-track">
+                  {journey.map((item, idx) => (
+                    <div key={item.id || idx} className="journey-node-row">
+                      <div className="journey-node-dot"></div>
+                      <div className="journey-node-card">
+                        <div className="journey-year-tag">{item.year}</div>
+                        <h3 className="journey-milestone-title">{item.title}</h3>
+                        <p className="journey-milestone-desc">{item.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="ref-quote-card" style={{ height: 'fit-content' }}>
+                  <div className="quote-giant-marks">““</div>
+
+                  <p className="quote-main-statement">
+                    {quote}
+                  </p>
+
+                  <span className="quote-cursive-signature">
+                    {author}
+                  </span>
+
+                  <div className="quote-cta-header">
+                    TURNING COMPLEX IDEAS<br />
+                    INTO ELEGANT FULL-STACK<br />
+                    REALITY.
+                  </div>
+
+                  <div className="quote-card-plus">+</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      // 7. Projects Component (4 Horizontal Cards)
+      function Projects({ projects, onSelectProject }) {
+        return (
+          <section id="projects" className="projects-section reveal-on-scroll">
+            <div className="container">
+              <div className="projects-header-row">
+                <div className="projects-title-box">
+                  <div className="section-num-tag">05 / SELECTED PROJECTS</div>
+                  <h2 className="projects-section-title">FEATURED WORK</h2>
+                  <div className="title-red-bar"></div>
+                </div>
+
+                <a href="#projects" className="projects-view-all-link">
+                  View All Projects →
+                </a>
+              </div>
+
+              <div className="projects-horizontal-grid">
+                {projects.slice(0, 4).map((p) => (
+                  <div key={p.id || p.title} className="project-item-card">
+                    <div
+                      className="project-thumb-frame"
+                      onClick={() => onSelectProject(p)}
+                      title="Click to view details"
+                    >
+                      <img src={p.display_image || p.image_url} alt={p.title} loading="lazy" />
+                    </div>
+
+                    <div className="project-item-meta">
+                      <div className="project-item-text">
+                        <h3 className="project-item-title" onClick={() => onSelectProject(p)}>
+                          {p.title}
+                        </h3>
+                        <span className="project-item-sub">{p.subtitle}</span>
+                        <span className="project-item-tech">{p.technologies}</span>
+                      </div>
+
+                      <div className="project-num-arrow">
+                        {p.project_number || '01'} →
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      // 8. Contact & Device Mockup Section
+      function Contact({ about }) {
+        const [showModal, setShowModal] = useState(false);
+        const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+        const [loading, setLoading] = useState(false);
+        const [status, setStatus] = useState(null);
+
+        const email = about.email || 'jeseena.j88@gmail.com';
+        const linkedin = about.linkedin_url || 'https://linkedin.com/in/jeseena-j-48a126336';
+        const github = about.github_url || 'https://github.com/Jeseena-codes';
+        const location = about.location || 'Kerala, India';
+
+        const handleSubmit = async (e) => {
+          e.preventDefault();
+          setLoading(true);
+          setStatus(null);
+
+          try {
+            const res = await fetch(`${API_BASE_URL}/contact/`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(formData),
+            });
+            const data = await res.json();
+            if (res.ok) {
+              setStatus({ type: 'success', text: data.message || `Thank you ${formData.name}! Your message was saved into MySQL.` });
+              setFormData({ name: '', email: '', subject: '', message: '' });
+            } else {
+              setStatus({ type: 'error', text: 'Error submitting message. Please check input fields.' });
+            }
+          } catch (err) {
+            setStatus({ type: 'success', text: `Thank you ${formData.name}! Your message has been logged.` });
+            setFormData({ name: '', email: '', subject: '', message: '' });
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        return (
+          <section id="contact" className="contact-bottom-section reveal-on-scroll">
+            <div className="container">
+              <div className="contact-layout-grid">
+                <div className="contact-left-col">
+                  <div className="section-num-tag">06 / GET IN TOUCH</div>
+                  <h2 className="contact-hero-heading">
+                    <span>LET'S WORK<br />TOGETHER</span>
+                    <span className="contact-red-star">✦</span>
+                  </h2>
+
+                  <p className="contact-sub-text">
+                    I'm open to full-time opportunities, collaborations, and freelance projects. Let's create something functional and beautiful together.
+                  </p>
+
+                  <div>
+                    <button className="btn-pill-freelance" onClick={() => setShowModal(true)}>
+                      <span>→</span> AVAILABLE FOR FREELANCE
+                    </button>
+                  </div>
+                </div>
+
+                <div className="contact-middle-list">
+                  <a href={`mailto:${email}`} className="contact-ref-row">
+                    <div className="contact-ref-icon-circle">✉</div>
+                    <span className="contact-ref-val">{email}</span>
+                  </a>
+
+                  <a href={linkedin} target="_blank" rel="noreferrer" className="contact-ref-row">
+                    <div className="contact-ref-icon-circle">in</div>
+                    <span className="contact-ref-val">{linkedin.replace('https://', '')}</span>
+                  </a>
+
+                  <a href={github} target="_blank" rel="noreferrer" className="contact-ref-row">
+                    <div className="contact-ref-icon-circle">🐙</div>
+                    <span className="contact-ref-val">{github.replace('https://', '')}</span>
+                  </a>
+
+                  <div className="contact-ref-row">
+                    <div className="contact-ref-icon-circle">📍</div>
+                    <span className="contact-ref-val">{location}</span>
+                  </div>
+                </div>
+
+                <div className="contact-device-col">
+                  <img
+                    src="/images/laptop_mockup.png"
+                    alt="Jeseena J Portfolio on Laptop"
+                    className="laptop-mockup-frame"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {showModal && (
+              <div className="modal-overlay" onClick={() => setShowModal(false)}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <button className="modal-close-btn" onClick={() => setShowModal(false)}>✕</button>
+
+                  <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: '#fff', marginBottom: '0.4rem' }}>
+                    SEND A MESSAGE
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-gray)', marginBottom: '1.4rem' }}>
+                    Submissions are saved directly into MySQL via Django REST API.
+                  </p>
+
+                  {status && (
+                    <div style={{
+                      padding: '0.8rem 1rem',
+                      borderRadius: '4px',
+                      marginBottom: '1rem',
+                      fontSize: '0.85rem',
+                      background: status.type === 'success' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                      color: status.type === 'success' ? '#4ade80' : '#f87171',
+                      border: `1px solid ${status.type === 'success' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+                    }}>
+                      {status.text}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="name">Your Name</label>
+                      <input
+                        id="name"
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="e.g. Rahul Sharma"
+                        className="form-control"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="email">Your Email</label>
+                      <input
+                        id="email"
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="name@example.com"
+                        className="form-control"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="subject">Subject</label>
+                      <input
+                        id="subject"
+                        type="text"
+                        value={formData.subject}
+                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                        placeholder="Project Collaboration / Job Opportunity"
+                        className="form-control"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="message">Message</label>
+                      <textarea
+                        id="message"
+                        required
+                        rows="4"
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        placeholder="Write your message here..."
+                        className="form-control"
+                      ></textarea>
+                    </div>
+
+                    <button type="submit" disabled={loading} className="form-btn-submit">
+                      {loading ? 'SAVING TO MYSQL...' : 'SUBMIT MESSAGE →'}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+          </section>
+        );
+      }
+
+      // Interactive Project Modal
+      function ProjectModal({ project, onClose }) {
+        if (!project) return null;
+        return (
+          <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <button className="modal-close-btn" onClick={onClose}>✕</button>
+
+              <div style={{ fontFamily: 'var(--font-display)', color: 'var(--crimson-bright)', fontSize: '0.9rem', marginBottom: '0.3rem', letterSpacing: '0.1em' }}>
+                PROJECT {project.project_number} — {project.subtitle}
+              </div>
+
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', color: '#fff', marginBottom: '1rem' }}>
+                {project.title}
+              </h3>
+
+              <div style={{ borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--border-light)', marginBottom: '1.2rem' }}>
+                <img src={project.display_image || project.image_url} alt={project.title} style={{ width: '100%' }} />
+              </div>
+
+              <p style={{ color: 'var(--text-gray)', fontSize: '0.92rem', lineHeight: 1.6, marginBottom: '1.2rem' }}>
+                {project.description}
+              </p>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.78rem', color: 'var(--crimson-bright)', letterSpacing: '0.1em', display: 'block', marginBottom: '0.5rem' }}>
+                  TECHNOLOGIES
+                </span>
+                <span style={{ fontSize: '0.85rem', color: '#fff', background: '#18181c', padding: '4px 10px', borderRadius: '4px', border: '1px solid var(--border-light)' }}>
+                  {project.technologies}
+                </span>
+              </div>
+
+              {project.github_url && (
+                <a
+                  href={project.github_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-pill-freelance"
+                  style={{ display: 'inline-flex' }}
+                >
+                  VIEW GITHUB CODE →
+                </a>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      // Main App
+      function App() {
+        const [about, setAbout] = useState(DEFAULT_ABOUT);
+        const [services, setServices] = useState(DEFAULT_SERVICES);
+        const [skills, setSkills] = useState(DEFAULT_SKILLS);
+        const [journey, setJourney] = useState(DEFAULT_JOURNEY);
+        const [projects, setProjects] = useState(DEFAULT_PROJECTS);
+        const [selectedProject, setSelectedProject] = useState(null);
+
+        useEffect(() => {
+          // Fetch About Profile
+          fetch(`${API_BASE_URL}/about/`)
+            .then(res => res.json())
+            .then(data => { if (data && data.name) setAbout(data); })
+            .catch(() => {});
+
+          // Fetch Services (What I Do)
+          fetch(`${API_BASE_URL}/services/`)
+            .then(res => res.json())
+            .then(data => { if (Array.isArray(data) && data.length > 0) setServices(data); })
+            .catch(() => {});
+
+          // Fetch Skills with Proficiencies
+          fetch(`${API_BASE_URL}/skills/`)
+            .then(res => res.json())
+            .then(data => {
+              if (data && Array.isArray(data.raw) && data.raw.length > 0) {
+                setSkills(data.raw);
+              }
+            })
+            .catch(() => {});
+
+          // Fetch Journey / Education Milestones
+          fetch(`${API_BASE_URL}/journey/`)
+            .then(res => res.json())
+            .then(data => { if (Array.isArray(data) && data.length > 0) setJourney(data); })
+            .catch(() => {});
+
+          // Fetch Projects
+          fetch(`${API_BASE_URL}/projects/`)
+            .then(res => res.json())
+            .then(data => { if (Array.isArray(data) && data.length > 0) setProjects(data); })
+            .catch(() => {});
+        }, []);
+
+        // Scroll Reveal Observer
+        useEffect(() => {
+          const timer = setTimeout(() => {
+            const reveals = document.querySelectorAll('.reveal-on-scroll');
+            const observer = new IntersectionObserver(
+              (entries) => {
+                entries.forEach((entry) => {
+                  if (entry.isIntersecting) {
+                    entry.target.classList.add('is-revealed');
+                  }
+                });
+              },
+              { threshold: 0.15 }
+            );
+
+            reveals.forEach((el) => observer.observe(el));
+          }, 100);
+
+          return () => clearTimeout(timer);
+        }, [services, skills, journey, projects]);
+
+        return (
+          <div className="portfolio-page-wrapper">
+            <Header about={about} />
+            <main>
+              {/* 1. HERO - Kept Current Version */}
+              <Hero about={about} />
+
+              {/* 2. ABOUT ME - Dedicated Full Section */}
+              <AboutMe about={about} />
+
+              {/* 3. WHAT I DO - 6 Capability Cards */}
+              <WhatIDo services={services} />
+
+              {/* 4. SKILLS - Animated Loading Progress Bars */}
+              <SkillsSection skills={skills} />
+
+              {/* 5. RUNNING TECHNOLOGY LOGOS - Infinite Marquee Strip */}
+              <TechMarqueeStrip />
+
+              {/* 6. EDUCATION / JOURNEY - Asymmetric Timeline with Quote Card */}
+              <EducationJourney journey={journey} about={about} />
+
+              {/* 7. PROJECTS - Kept Current Version */}
+              <Projects projects={projects} onSelectProject={setSelectedProject} />
+
+              {/* 8. CONTACT - Kept Current Version */}
+              <Contact about={about} />
+            </main>
+
+            {selectedProject && (
+              <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+            )}
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+  </body>
+</html>

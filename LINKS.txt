@@ -1,0 +1,41 @@
+====================================================================
+           JESEENA — FULL STACK DEVELOPER PORTFOLIO LINKS
+====================================================================
+
+1. PUBLIC PORTFOLIO WEBSITE (Recruiter Link):
+   http://localhost:3000/
+   (Alternative: http://127.0.0.1:3000/)
+
+2. PRIVATE DJANGO ADMIN PANEL (Content & CV Management):
+   http://127.0.0.1:8000/admin/
+   Default Login:
+   - Username: admin
+   - Password: admin123
+   (Allows updating Profile, Skills, Projects, Education, and replacing CV PDF)
+
+3. DJANGO REST API ENDPOINTS:
+   - Resume / CV Info:     http://127.0.0.1:8000/api/resume/
+   - Resume Direct Stream: http://127.0.0.1:8000/api/resume/download/
+   - About Profile:        http://127.0.0.1:8000/api/about/
+   - Projects Feed:        http://127.0.0.1:8000/api/projects/
+   - Skills Feed:          http://127.0.0.1:8000/api/skills/
+   - Education Feed:       http://127.0.0.1:8000/api/education/
+   - Social Links:         http://127.0.0.1:8000/api/social-links/
+   - Contact Submission:   http://127.0.0.1:8000/api/contact/
+   - Health Monitor:       http://127.0.0.1:8000/api/health/
+
+====================================================================
+EASIEST WAY TO LAUNCH (ONE CLICK):
+====================================================================
+Double-click "START_PORTFOLIO.bat" in d:\portfolio
+This starts both backend and frontend servers AND automatically opens
+http://localhost:3000/ in your browser.
+
+OR Launch Manually:
+Step 1: Double-click "run_backend.bat"  (Starts Django on port 8000)
+Step 2: Double-click "run_frontend.bat" (Starts React on port 3000)
+Step 3: Open http://localhost:3000/ in your browser!
+
+Note: In VS Code / Antigravity editor, hold 'Ctrl' while clicking
+links (Ctrl + Click) to open them in your browser.
+====================================================================
