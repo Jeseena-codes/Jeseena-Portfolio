@@ -1,0 +1,472 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Portfolio Management Portal') }}{% endblock %}
+
+{% block branding %}
+<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 1.5rem; flex-wrap: wrap;">
+    <h1 id="site-name" style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 700; letter-spacing: 0.05em; font-size: 1.25rem;">
+        <a href="{% url 'admin:index' %}" class="site-branding-link" style="text-decoration: none; display: flex; align-items: center; gap: 0.6rem;">
+            <span style="color: #d32f2f; font-size: 1.4rem;">✦</span>
+            <span>JESEENA J <span class="site-branding-sub" style="font-size: 0.82rem; font-weight: 400; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 0.6rem; margin-left: 0.2rem;">Portfolio CMS & Control Panel</span></span>
+        </a>
+    </h1>
+    <div style="display: flex; align-items: center; gap: 0.8rem;">
+        <a href="http://localhost:3000/" target="_blank" rel="noopener noreferrer" style="background: linear-gradient(135deg, #d32f2f, #991b1b); color: #ffffff; padding: 0.45rem 1rem; border-radius: 4px; font-size: 0.82rem; font-weight: 600; text-decoration: none; letter-spacing: 0.04em; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 12px rgba(211, 47, 47, 0.35); transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+            <span>View Live Portfolio</span>
+            <span style="font-size: 0.95rem;">↗</span>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+(function() {
+    function syncTheme() {
+        var theme = document.documentElement.dataset.theme || localStorage.getItem('theme');
+        if (theme === 'light' || (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            document.documentElement.classList.add('admin-light-mode');
+            document.documentElement.classList.remove('admin-dark-mode');
+            if (theme === 'light' && document.documentElement.dataset.theme !== 'light') {
+                document.documentElement.dataset.theme = 'light';
+            }
+        } else {
+            document.documentElement.classList.add('admin-dark-mode');
+            document.documentElement.classList.remove('admin-light-mode');
+        }
+    }
+    syncTheme();
+    document.addEventListener('DOMContentLoaded', syncTheme);
+    if (window.MutationObserver) {
+        new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    }
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', syncTheme);
+    }
+})();
+</script>
+<style>
+    /* =========================================================================
+       DARK THEME (Default)
+       ========================================================================= */
+    :root, [data-theme="dark"], html:not([data-theme="light"]):not(.admin-light-mode) {
+        --primary: #d32f2f;
+        --secondary: #991b1b;
+        --accent: #ef4444;
+        --primary-fg: #ffffff;
+        --body-bg: #121216;
+        --darkened-bg: #09090b;
+        --body-fg: #e4e4e7;
+        --body-quiet-color: #a1a1aa;
+        --body-loud-color: #ffffff;
+        --header-bg: #0a0a0c;
+        --header-color: #ffffff;
+        --header-branding-color: #ffffff;
+        --header-link-color: #f43f5e;
+        --breadcrumbs-bg: #18181c;
+        --breadcrumbs-link-fg: #d32f2f;
+        --breadcrumbs-fg: #a1a1aa;
+        --link-fg: #f87171;
+        --link-hover-color: #fca5a5;
+        --link-selected-fg: #ef4444;
+        --hairline-color: #27272a;
+        --border-color: #27272a;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) #header {
+        background: #0a0a0c !important;
+        border-bottom: 2px solid #d32f2f !important;
+        padding: 0.9rem 1.5rem !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) .site-branding-link {
+        color: #ffffff !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) .site-branding-sub {
+        color: #a1a1aa !important;
+        border-left-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) div.breadcrumbs {
+        background: #151518 !important;
+        border-bottom: 1px solid #27272a !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) .module h2, 
+    html:not([data-theme="light"]):not(.admin-light-mode) .module caption, 
+    html:not([data-theme="light"]):not(.admin-light-mode) .inline-group h2 {
+        background: #18181c !important;
+        color: #ffffff !important;
+        border-left: 3px solid #d32f2f !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) #user-tools a:hover {
+        color: #ef4444 !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) #nav-sidebar {
+        background: #121216 !important;
+        border-right: 1px solid #27272a !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) .toggle-nav-sidebar {
+        background: #121216 !important;
+        border-right: 1px solid #27272a !important;
+        color: #a1a1aa !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) #nav-sidebar th, 
+    html:not([data-theme="light"]):not(.admin-light-mode) #nav-sidebar caption,
+    html:not([data-theme="light"]):not(.admin-light-mode) #nav-sidebar caption a,
+    html:not([data-theme="light"]):not(.admin-light-mode) #nav-sidebar .section {
+        background: #18181c !important;
+        color: #ffffff !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) #nav-sidebar a {
+        color: #d4d4d8 !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) #nav-sidebar a:hover {
+        color: #f87171 !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) #nav-sidebar tr.current-model {
+        background: rgba(211, 47, 47, 0.15) !important;
+        border-left: 3px solid #d32f2f !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) #nav-sidebar tr.current-model a {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+    }
+    html:not([data-theme="light"]):not(.admin-light-mode) .btn-visible-edit {
+        background: #271216 !important;
+        color: #fca5a5 !important;
+        border: 1px solid #ef4444 !important;
+    }
+
+    /* Common Button Styles */
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: #d32f2f !important;
+        border-color: #991b1b !important;
+        color: #ffffff !important;
+        border-radius: 4px !important;
+        font-weight: 600 !important;
+    }
+    .button:hover, input[type=submit]:hover, input[type=button]:hover {
+        background: #b91c1c !important;
+    }
+    .button.default, input[type=submit].default, .submit-row input.default {
+        background: linear-gradient(135deg, #d32f2f, #991b1b) !important;
+    }
+
+    /* Standardized Visible ✏ Edit Action Buttons Across All CMS Sections */
+    .btn-visible-edit {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.35rem !important;
+        padding: 0.28rem 0.75rem !important;
+        border-radius: 4px !important;
+        font-weight: 600 !important;
+        font-size: 0.8rem !important;
+        text-decoration: none !important;
+        white-space: nowrap !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    }
+    .btn-visible-edit:hover {
+        background: #d32f2f !important;
+        color: #ffffff !important;
+        border-color: #f87171 !important;
+        box-shadow: 0 4px 12px rgba(211, 47, 47, 0.45) !important;
+        transform: translateY(-1px) !important;
+    }
+    .field-edit_action {
+        text-align: right !important;
+        width: 100px !important;
+        white-space: nowrap !important;
+    }
+    th.column-edit_action {
+        text-align: right !important;
+        width: 100px !important;
+    }
+
+    /* =========================================================================
+       LIGHT THEME (High-Contrast, Clean White Theme with 100% Visibility)
+       ========================================================================= */
+    [data-theme="light"], html.admin-light-mode, body.admin-light-mode {
+        --primary: #d32f2f;
+        --secondary: #991b1b;
+        --accent: #b91c1c;
+        --primary-fg: #ffffff;
+        --body-bg: #f8fafc !important;
+        --darkened-bg: #ffffff !important;
+        --body-fg: #0f172a !important;
+        --body-quiet-color: #64748b !important;
+        --body-loud-color: #0f172a !important;
+        --header-bg: #ffffff !important;
+        --header-color: #0f172a !important;
+        --header-branding-color: #0f172a !important;
+        --header-link-color: #b91c1c !important;
+        --breadcrumbs-bg: #ffffff !important;
+        --breadcrumbs-link-fg: #b91c1c !important;
+        --breadcrumbs-fg: #64748b !important;
+        --link-fg: #b91c1c !important;
+        --link-hover-color: #dc2626 !important;
+        --link-selected-fg: #b91c1c !important;
+        --hairline-color: #e2e8f0 !important;
+        --border-color: #e2e8f0 !important;
+    }
+
+    [data-theme="light"] body, html.admin-light-mode body {
+        background: #f8fafc !important;
+        color: #0f172a !important;
+    }
+
+    /* Light Theme Header */
+    [data-theme="light"] #header, html.admin-light-mode #header {
+        background: #ffffff !important;
+        border-bottom: 2px solid #d32f2f !important;
+        padding: 0.9rem 1.5rem !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+    }
+    [data-theme="light"] .site-branding-link, html.admin-light-mode .site-branding-link {
+        color: #0f172a !important;
+    }
+    [data-theme="light"] .site-branding-sub, html.admin-light-mode .site-branding-sub {
+        color: #64748b !important;
+        border-left: 1px solid rgba(0, 0, 0, 0.15) !important;
+    }
+    [data-theme="light"] #user-tools, html.admin-light-mode #user-tools {
+        color: #475569 !important;
+    }
+    [data-theme="light"] #user-tools a, html.admin-light-mode #user-tools a {
+        color: #b91c1c !important;
+    }
+    [data-theme="light"] #user-tools a:hover, html.admin-light-mode #user-tools a:hover {
+        color: #dc2626 !important;
+    }
+    [data-theme="light"] #user-tools form button, html.admin-light-mode #user-tools form button {
+        background: transparent !important;
+        border: none !important;
+        color: #b91c1c !important;
+        cursor: pointer !important;
+        padding: 0 !important;
+        font-size: inherit !important;
+        font-family: inherit !important;
+        font-weight: normal !important;
+        box-shadow: none !important;
+    }
+    [data-theme="light"] #user-tools form button:hover, html.admin-light-mode #user-tools form button:hover {
+        color: #dc2626 !important;
+        background: transparent !important;
+    }
+    [data-theme="light"] .theme-toggle button, html.admin-light-mode .theme-toggle button {
+        background: transparent !important;
+        border: none !important;
+        color: #0f172a !important;
+        box-shadow: none !important;
+    }
+
+    /* Light Theme Breadcrumbs */
+    [data-theme="light"] div.breadcrumbs, html.admin-light-mode div.breadcrumbs {
+        background: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        color: #64748b !important;
+    }
+    [data-theme="light"] div.breadcrumbs a, html.admin-light-mode div.breadcrumbs a {
+        color: #b91c1c !important;
+    }
+    [data-theme="light"] div.breadcrumbs a:hover, html.admin-light-mode div.breadcrumbs a:hover {
+        color: #dc2626 !important;
+    }
+
+    /* Light Theme Nav Sidebar */
+    [data-theme="light"] .toggle-nav-sidebar, html.admin-light-mode .toggle-nav-sidebar {
+        background: #f8fafc !important;
+        border-right: 1px solid #e2e8f0 !important;
+        color: #64748b !important;
+    }
+    [data-theme="light"] .toggle-nav-sidebar:hover, html.admin-light-mode .toggle-nav-sidebar:hover {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+    }
+    [data-theme="light"] #nav-sidebar, html.admin-light-mode #nav-sidebar {
+        background: #ffffff !important;
+        border-right: 1px solid #e2e8f0 !important;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.02) !important;
+    }
+    [data-theme="light"] #nav-sidebar th, 
+    [data-theme="light"] #nav-sidebar caption,
+    html.admin-light-mode #nav-sidebar th,
+    html.admin-light-mode #nav-sidebar caption {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        font-weight: 700 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+    [data-theme="light"] #nav-sidebar caption a,
+    [data-theme="light"] #nav-sidebar .section,
+    html.admin-light-mode #nav-sidebar caption a,
+    html.admin-light-mode #nav-sidebar .section {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+    [data-theme="light"] #nav-sidebar a, html.admin-light-mode #nav-sidebar a {
+        color: #334155 !important;
+    }
+    [data-theme="light"] #nav-sidebar a:hover, html.admin-light-mode #nav-sidebar a:hover {
+        color: #b91c1c !important;
+        background: #f8fafc !important;
+    }
+    [data-theme="light"] #nav-sidebar .addlink, html.admin-light-mode #nav-sidebar .addlink {
+        color: #15803d !important;
+        font-weight: 600 !important;
+    }
+    [data-theme="light"] #nav-sidebar .addlink:hover, html.admin-light-mode #nav-sidebar .addlink:hover {
+        color: #166534 !important;
+    }
+    [data-theme="light"] #nav-sidebar tr.current-model, html.admin-light-mode #nav-sidebar tr.current-model {
+        background: rgba(211, 47, 47, 0.08) !important;
+        border-left: 3px solid #d32f2f !important;
+    }
+    [data-theme="light"] #nav-sidebar tr.current-model a, html.admin-light-mode #nav-sidebar tr.current-model a {
+        color: #b91c1c !important;
+        font-weight: 700 !important;
+    }
+    [data-theme="light"] #nav-sidebar tr, html.admin-light-mode #nav-sidebar tr {
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+    [data-theme="light"] #nav-filter, html.admin-light-mode #nav-filter {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    [data-theme="light"] #nav-filter:focus, html.admin-light-mode #nav-filter:focus {
+        border-color: #d32f2f !important;
+        box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2) !important;
+    }
+    [data-theme="light"] #content h1,
+    [data-theme="light"] #content h2,
+    [data-theme="light"] #content h3,
+    html.admin-light-mode #content h1,
+    html.admin-light-mode #content h2,
+    html.admin-light-mode #content h3 {
+        color: #0f172a !important;
+    }
+
+    /* Light Theme Modules & Tables */
+    [data-theme="light"] .module, html.admin-light-mode .module {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    }
+    [data-theme="light"] .module h2, 
+    [data-theme="light"] .module caption, 
+    [data-theme="light"] .inline-group h2,
+    html.admin-light-mode .module h2, 
+    html.admin-light-mode .module caption, 
+    html.admin-light-mode .inline-group h2 {
+        background: #f8fafc !important;
+        color: #0f172a !important;
+        border-left: 3px solid #d32f2f !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+    [data-theme="light"] table, html.admin-light-mode table {
+        background: #ffffff !important;
+        color: #0f172a !important;
+    }
+    [data-theme="light"] table th, html.admin-light-mode table th {
+        background: #f1f5f9 !important;
+        color: #334155 !important;
+        border-bottom: 2px solid #e2e8f0 !important;
+        font-weight: 700 !important;
+    }
+    [data-theme="light"] table th a, html.admin-light-mode table th a {
+        color: #334155 !important;
+    }
+    [data-theme="light"] table td, html.admin-light-mode table td {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+    [data-theme="light"] table tr:hover td, html.admin-light-mode table tr:hover td {
+        background: #f8fafc !important;
+    }
+    [data-theme="light"] table td a, html.admin-light-mode table td a {
+        color: #b91c1c !important;
+    }
+
+    /* Light Theme Form Controls */
+    [data-theme="light"] input[type=text],
+    [data-theme="light"] input[type=password],
+    [data-theme="light"] input[type=email],
+    [data-theme="light"] input[type=url],
+    [data-theme="light"] input[type=number],
+    [data-theme="light"] textarea,
+    [data-theme="light"] select,
+    html.admin-light-mode input[type=text],
+    html.admin-light-mode input[type=password],
+    html.admin-light-mode input[type=email],
+    html.admin-light-mode input[type=url],
+    html.admin-light-mode input[type=number],
+    html.admin-light-mode textarea,
+    html.admin-light-mode select {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    [data-theme="light"] input:focus,
+    [data-theme="light"] textarea:focus,
+    [data-theme="light"] select:focus,
+    html.admin-light-mode input:focus,
+    html.admin-light-mode textarea:focus,
+    html.admin-light-mode select:focus {
+        border-color: #d32f2f !important;
+        box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2) !important;
+        outline: none !important;
+    }
+    [data-theme="light"] .form-row, html.admin-light-mode .form-row {
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+    [data-theme="light"] .form-row label, html.admin-light-mode .form-row label {
+        color: #334155 !important;
+    }
+    [data-theme="light"] .help, [data-theme="light"] p.help,
+    html.admin-light-mode .help, html.admin-light-mode p.help {
+        color: #64748b !important;
+    }
+    [data-theme="light"] .submit-row, html.admin-light-mode .submit-row {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    /* Light Theme Changelist Filter */
+    [data-theme="light"] #changelist-filter, html.admin-light-mode #changelist-filter {
+        background: #ffffff !important;
+        border-left: 1px solid #e2e8f0 !important;
+    }
+    [data-theme="light"] #changelist-filter h2, html.admin-light-mode #changelist-filter h2 {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+    }
+    [data-theme="light"] #changelist-filter h3, html.admin-light-mode #changelist-filter h3 {
+        color: #334155 !important;
+    }
+    [data-theme="light"] #changelist-filter a, html.admin-light-mode #changelist-filter a {
+        color: #475569 !important;
+    }
+    [data-theme="light"] #changelist-filter a:hover, html.admin-light-mode #changelist-filter a:hover {
+        color: #b91c1c !important;
+    }
+    [data-theme="light"] #changelist-filter li.selected a, html.admin-light-mode #changelist-filter li.selected a {
+        color: #b91c1c !important;
+        font-weight: 700 !important;
+    }
+
+    /* Light Theme ✏ Edit Button */
+    [data-theme="light"] .btn-visible-edit, html.admin-light-mode .btn-visible-edit {
+        background: #fee2e2 !important;
+        color: #b91c1c !important;
+        border: 1px solid #fca5a5 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    [data-theme="light"] .btn-visible-edit:hover, html.admin-light-mode .btn-visible-edit:hover {
+        background: #dc2626 !important;
+        color: #ffffff !important;
+        border-color: #b91c1c !important;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3) !important;
+    }
+</style>
+{% endblock %}

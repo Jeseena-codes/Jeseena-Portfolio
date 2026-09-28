@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import connection
 from django.shortcuts import redirect
-from .models import About, Project, Skill, Service, Journey, WorkProcess, ContactMessage, Resume
+from .models import About, Project, Skill, Service, Journey, WorkProcess, ContactMessage, Resume, SocialLink
 from .serializers import (
     AboutSerializer,
     ProjectSerializer,
@@ -13,6 +13,7 @@ from .serializers import (
     WorkProcessSerializer,
     ContactMessageSerializer,
     ResumeSerializer,
+    SocialLinkSerializer,
 )
 
 class AboutView(APIView):
@@ -66,12 +67,17 @@ class SocialLinksView(APIView):
     Returns official social links for Jeseena.
     """
     def get(self, request):
-        about = About.objects.first()
-        return Response({
-            'github': about.github_url if about else 'https://github.com/Jeseena-codes',
-            'linkedin': about.linkedin_url if about else 'https://linkedin.com/in/jeseena-j-48a126336',
-            'email': about.email if about else 'jeseena2005@gmail.com',
-        }, status=status.HTTP_200_OK)
+        links = SocialLink.objects.filter(is_active=True).order_by('order', 'id')
+        if not links.exists():
+            about = About.objects.first()
+            defaults = [
+                {'id': 1, 'platform_name': 'GitHub', 'url': about.github_url if about else 'https://github.com/Jeseena-codes', 'icon': 'bx bxl-github', 'order': 1},
+                {'id': 2, 'platform_name': 'LinkedIn', 'url': about.linkedin_url if about else 'https://linkedin.com/in/jeseena-j-48a126336', 'icon': 'bx bxl-linkedin', 'order': 2},
+                {'id': 3, 'platform_name': 'Email', 'url': f"mailto:{about.email}" if about else 'mailto:jeseena2005@gmail.com', 'icon': 'bx bx-envelope', 'order': 3},
+            ]
+            return Response(defaults, status=status.HTTP_200_OK)
+        serializer = SocialLinkSerializer(links, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ProjectListView(APIView):
@@ -138,7 +144,7 @@ class JourneyListView(APIView):
     Returns education and learning milestones in display order.
     """
     def get(self, request):
-        milestones = Journey.objects.all().order_by('order', 'id')
+        milestones = Journey.objects.filter(is_active=True).order_by('order', 'id')
         serializer = JourneySerializer(milestones, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -148,7 +154,7 @@ class WorkProcessListView(APIView):
     Returns work process methodology steps in sequential order.
     """
     def get(self, request):
-        steps = WorkProcess.objects.all().order_by('order', 'id')
+        steps = WorkProcess.objects.filter(is_active=True).order_by('order', 'id')
         serializer = WorkProcessSerializer(steps, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

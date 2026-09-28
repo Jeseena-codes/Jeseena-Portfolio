@@ -13,6 +13,6 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Custom admin header styling
-admin.site.site_header = "Jeseena J - Portfolio Admin"
+admin.site.site_header = "JESEENA J — Portfolio CMS & Admin Panel"
 admin.site.site_title = "Portfolio Management Portal"
-admin.site.index_title = "Content & Message Management"
+admin.site.index_title = "Portfolio Content & Section Management"

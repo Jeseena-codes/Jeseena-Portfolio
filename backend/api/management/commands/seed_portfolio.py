@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from api.models import About, Project, Skill, Service, Journey, WorkProcess, ContactMessage, Resume
+from api.models import About, Project, Skill, Service, Journey, WorkProcess, ContactMessage, Resume, SocialLink
 
 class Command(BaseCommand):
     help = 'Seeds database with original portfolio writings while keeping authentic CV file and Currently Learning area'
@@ -226,5 +226,17 @@ class Command(BaseCommand):
         for s_num, s_title, s_desc, s_skills, s_order in services_data:
             Service.objects.create(service_number=s_num, title=s_title, description=s_desc, skills_list=s_skills, order=s_order)
         self.stdout.write("  + Seeded 6 Core Services (Original Writings)")
+
+        # 7. Seed Social & Connect Links (Dynamic Admin Manageable)
+        SocialLink.objects.all().delete()
+        social_links_data = [
+            ('WhatsApp', 'https://wa.me/917736998984', 'bx bxl-whatsapp', 1),
+            ('GitHub', 'https://github.com/Jeseena-codes', 'bx bxl-github', 2),
+            ('LinkedIn', 'https://linkedin.com/in/jeseena-j-48a126336', 'bx bxl-linkedin', 3),
+            ('Email', 'mailto:jeseena2005@gmail.com', 'bx bx-envelope', 4),
+        ]
+        for name, url, icon, order in social_links_data:
+            SocialLink.objects.create(platform_name=name, url=url, icon=icon, order=order, is_active=True)
+        self.stdout.write("  + Seeded Social Links (WhatsApp, GitHub, LinkedIn, Email)")
 
         self.stdout.write(self.style.SUCCESS('Successfully updated database with original writings and authentic CV!'))

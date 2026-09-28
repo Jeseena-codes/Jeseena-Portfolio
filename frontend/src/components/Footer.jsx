@@ -40,36 +40,33 @@ export default function Footer({ about: propAbout, cvUrl }) {
 
           {/* Social / Logo Icons */}
           <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center' }}>
-            <a
-              href={about?.github_url || 'https://github.com/Jeseena-codes'}
-              target="_blank"
-              rel="noreferrer"
-              className="hero-social-icon-circle"
-              title="GitHub"
-            >
-              <i className="bx bxl-github"></i>
-            </a>
-            <a
-              href={about?.linkedin_url || 'https://linkedin.com/in/jeseena-j-48a126336'}
-              target="_blank"
-              rel="noreferrer"
-              className="hero-social-icon-circle"
-              title="LinkedIn"
-            >
-              <i className="bx bxl-linkedin"></i>
-            </a>
-            <a
-              href={`mailto:${about?.email || 'jeseena2005@gmail.com'}`}
-              className="hero-social-icon-circle"
-              title="Email"
-            >
-              <i className="bx bx-envelope"></i>
-            </a>
+            {(about?.social_links && about.social_links.length > 0
+              ? about.social_links
+              : [
+                  { id: 1, platform_name: 'GitHub', url: about?.github_url || 'https://github.com/Jeseena-codes', icon: 'bx bxl-github' },
+                  { id: 2, platform_name: 'LinkedIn', url: about?.linkedin_url || 'https://linkedin.com/in/jeseena-j-48a126336', icon: 'bx bxl-linkedin' },
+                  { id: 3, platform_name: 'Email', url: `mailto:${about?.email || 'jeseena2005@gmail.com'}`, icon: 'bx bx-envelope' },
+                ]
+            ).map((link, idx) => {
+              const isMail = (link.url || '').startsWith('mailto:');
+              return (
+                <a
+                  key={link.id || idx}
+                  href={link.url}
+                  target={isMail ? '_self' : '_blank'}
+                  rel="noreferrer"
+                  className="hero-social-icon-circle"
+                  title={link.platform_name || 'Social'}
+                >
+                  <i className={link.icon || 'bx bx-link'}></i>
+                </a>
+              );
+            })}
           </div>
         </div>
 
         <div className="footer-bottom" style={{ textAlign: 'center', borderTop: '1px solid var(--border-ultra-light)', padding: '1.2rem 0', color: 'var(--text-gray)', fontSize: '0.85rem' }}>
-          <span>© 2026 Jeseena. All rights reserved. • Built with React &amp; Django REST Framework.</span>
+          <span>© {new Date().getFullYear()} {about?.name || 'Jeseena'}. {about?.footer_copyright_text || 'All rights reserved. • Built with React & Django REST Framework.'}</span>
         </div>
       </div>
     </footer>

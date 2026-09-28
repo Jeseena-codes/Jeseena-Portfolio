@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { sendContactMessage } from '../services/api';
+import InteractiveImage3D from './InteractiveImage3D';
+import TextRepel from './TextRepel';
 
 export default function Contact({ about }) {
   const [showFormModal, setShowFormModal] = useState(false);
@@ -12,6 +14,29 @@ export default function Contact({ about }) {
   const linkedin = about?.linkedin_url || 'https://linkedin.com/in/jeseena-j-48a126336';
   const github = about?.github_url || 'https://github.com/Jeseena-codes';
   const location = about?.location || 'Palakkad, Kerala';
+  const contactHeading = about?.contact_heading || "LET'S WORK TOGETHER";
+  const contactSubtext = about?.contact_subtext || "I'm actively seeking full-time Full Stack Developer roles, collaborations, and project opportunities. Let's create something reliable, performant, and elegant.";
+  const deviceMockup = about?.display_device_mockup || '/images/laptop_mockup.png';
+
+  const renderContactHeading = () => {
+    if (contactHeading.includes(' ')) {
+      const words = contactHeading.split(' ');
+      const half = Math.ceil(words.length / 2);
+      const line1 = words.slice(0, half).join(' ');
+      const line2 = words.slice(half).join(' ');
+      return (
+        <TextRepel
+          as="span"
+          segments={[
+            { text: line1 },
+            { isBreak: true },
+            { text: line2 }
+          ]}
+        />
+      );
+    }
+    return <TextRepel as="span" text={contactHeading} />;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,12 +66,12 @@ export default function Contact({ about }) {
           {/* Left Column: Heading, Subtitle & Action */}
           <div className="contact-left-col">
             <h2 className="contact-hero-heading">
-              <span>LET'S WORK<br />TOGETHER</span>
+              {renderContactHeading()}
               <span className="contact-red-star">✦</span>
             </h2>
 
             <p className="contact-sub-text">
-              I'm actively seeking full-time Full Stack Developer roles, collaborations, and project opportunities. Let's create something reliable, performant, and elegant.
+              {contactSubtext}
             </p>
 
             <div>
@@ -73,47 +98,59 @@ export default function Contact({ about }) {
           {/* Middle Column: Channels with Circular Icons */}
           <div className="contact-middle-list">
             {/* Email */}
-            <a href={`mailto:${email}`} className="contact-ref-row">
-              <div className="contact-ref-icon-circle"><i className="bx bx-envelope"></i></div>
-              <span className="contact-ref-val">{email}</span>
-            </a>
+            {email && (
+              <a href={`mailto:${email}`} className="contact-ref-row">
+                <div className="contact-ref-icon-circle"><i className="bx bx-envelope"></i></div>
+                <span className="contact-ref-val">{email}</span>
+              </a>
+            )}
 
             {/* Phone */}
-            <a href={`tel:${phone.replace(/\s+/g, '')}`} className="contact-ref-row">
-              <div className="contact-ref-icon-circle"><i className="bx bx-phone"></i></div>
-              <span className="contact-ref-val">{phone}</span>
-            </a>
+            {phone && (
+              <a href={`tel:${phone.replace(/\s+/g, '')}`} className="contact-ref-row">
+                <div className="contact-ref-icon-circle"><i className="bx bx-phone"></i></div>
+                <span className="contact-ref-val">{phone}</span>
+              </a>
+            )}
 
             {/* LinkedIn */}
-            <a href={linkedin} target="_blank" rel="noreferrer" className="contact-ref-row">
-              <div className="contact-ref-icon-circle"><i className="bx bxl-linkedin"></i></div>
-              <span className="contact-ref-val">
-                {linkedin.replace('https://', '')}
-              </span>
-            </a>
+            {linkedin && (
+              <a href={linkedin} target="_blank" rel="noreferrer" className="contact-ref-row">
+                <div className="contact-ref-icon-circle"><i className="bx bxl-linkedin"></i></div>
+                <span className="contact-ref-val">
+                  {linkedin.replace('https://', '').replace(/\/$/, '')}
+                </span>
+              </a>
+            )}
 
             {/* GitHub */}
-            <a href={github} target="_blank" rel="noreferrer" className="contact-ref-row">
-              <div className="contact-ref-icon-circle"><i className="bx bxl-github"></i></div>
-              <span className="contact-ref-val">
-                {github.replace('https://', '')}
-              </span>
-            </a>
+            {github && (
+              <a href={github} target="_blank" rel="noreferrer" className="contact-ref-row">
+                <div className="contact-ref-icon-circle"><i className="bx bxl-github"></i></div>
+                <span className="contact-ref-val">
+                  {github.replace('https://', '').replace(/\/$/, '')}
+                </span>
+              </a>
+            )}
 
             {/* Location */}
-            <div className="contact-ref-row">
-              <div className="contact-ref-icon-circle"><i className="bx bx-map"></i></div>
-              <span className="contact-ref-val">{location}</span>
-            </div>
+            {location && (
+              <div className="contact-ref-row">
+                <div className="contact-ref-icon-circle"><i className="bx bx-map"></i></div>
+                <span className="contact-ref-val">{location}</span>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Device Mockup */}
           <div className="contact-device-col">
-            <img
-              src="/images/laptop_mockup.png"
-              alt="Jeseena J Portfolio on Device"
+            <InteractiveImage3D
+              src={deviceMockup}
+              alt={`${about?.name || 'Developer'} Portfolio on Device`}
               className="laptop-mockup-frame"
               loading="lazy"
+              onError={(e) => { e.currentTarget.src = '/images/laptop_mockup.png'; }}
+              imgStyle={{ filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.9))' }}
             />
           </div>
         </div>

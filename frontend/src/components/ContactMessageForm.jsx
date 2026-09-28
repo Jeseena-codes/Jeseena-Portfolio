@@ -22,7 +22,7 @@ export default function ContactMessageForm() {
       } else {
         setStatus({
           type: 'error',
-          text: res?.error || 'Error submitting message. Please check required fields.'
+          text: res.message || 'Please enter at least 5 characters in your message.'
         });
       }
     } catch (err) {
@@ -100,6 +100,9 @@ export default function ContactMessageForm() {
 
             <div className="contact-form-group">
               <label className="contact-form-label" htmlFor="msg-message">Message *</label>
+              <small style={{ display: 'block', marginTop: '0.3rem', marginBottom: '0.5rem', color: 'var(--text-gray)', fontSize: '0.75rem' }}>
+                Please enter at least 5 characters.
+              </small>
               <textarea
                 id="msg-message"
                 required

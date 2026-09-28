@@ -1,0 +1,2316 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}RESUME / CV Management | {{ site_title|default:_('Portfolio Admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label='api' %}">API</a>
+&rsaquo; RESUME / CV
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="cv-mgmt-container">
+
+    <!-- Header & Quick Nav -->
+    <div class="cv-header-banner">
+        <div class="cv-header-title-box">
+            <div class="cv-badge">RESUME / CV</div>
+            <h1 class="cv-main-title">Curriculum Vitae Management Portal</h1>
+            <p class="cv-main-subtitle">Manage personal information, professional summary, skills, projects, courses, education, certifications, and languages.</p>
+        </div>
+        <div class="cv-header-actions">
+            {% if resume and resume.file %}
+            <a href="{{ resume.file.url }}" target="_blank" class="btn-cv-action btn-cv-view">
+                <span>📄 View Active PDF</span>
+                <span>↗</span>
+            </a>
+            {% endif %}
+            <a href="#cv-document" class="btn-cv-action btn-cv-upload">
+                <span>📤 Update CV PDF</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Anchor Strip -->
+    <nav class="cv-quick-nav">
+        <a href="#personal-info" class="cv-nav-pill"><span>👤</span> Personal Info</a>
+        <a href="#professional-summary" class="cv-nav-pill"><span>📝</span> Summary</a>
+        <a href="#skills" class="cv-nav-pill"><span>⚡</span> Skills ({{ skills|length }})</a>
+        <a href="#projects" class="cv-nav-pill"><span>🚀</span> Projects ({{ projects|length }})</a>
+        <a href="#courses" class="cv-nav-pill"><span>📚</span> Courses ({{ courses|length }})</a>
+        <a href="#education" class="cv-nav-pill"><span>🎓</span> Education ({{ education|length }})</a>
+        <a href="#certifications" class="cv-nav-pill"><span>🏆</span> Certifications ({{ certifications|length }})</a>
+        <a href="#languages" class="cv-nav-pill"><span>🌐</span> Languages ({{ languages|length }})</a>
+        <a href="#cv-document" class="cv-nav-pill"><span>📄</span> CV Document</a>
+    </nav>
+
+    {% if messages %}
+    <div class="cv-messages-wrap">
+        {% for message in messages %}
+        <div class="cv-alert {% if message.tags %}cv-alert-{{ message.tags }}{% endif %}">
+            <span class="cv-alert-icon">✓</span>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ==========================================
+         1. PERSONAL INFORMATION
+         ========================================== -->
+    <section id="personal-info" class="cv-card-section">
+        <div class="cv-card-header">
+            <div class="cv-card-title-group">
+                <span class="cv-sec-num">01</span>
+                <div>
+                    <h2 class="cv-sec-title">Personal Information</h2>
+                    <p class="cv-sec-desc">Update contact details, location, and professional profiles appearing on your CV and portfolio.</p>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}" class="cv-form-block">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_personal_info">
+
+            <div class="cv-grid-2">
+                <div class="cv-field-group">
+                    <label class="cv-label">Full Name</label>
+                    <input type="text" name="name" class="cv-input" value="{{ about.name|default:'Jeseena J' }}" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Professional Title</label>
+                    <input type="text" name="professional_title" class="cv-input" value="{{ about.professional_title|default:'Full Stack Developer' }}" required>
+                </div>
+            </div>
+
+            <div class="cv-grid-3">
+                <div class="cv-field-group">
+                    <label class="cv-label">Email Address</label>
+                    <input type="email" name="email" class="cv-input" value="{{ about.email|default:'jeseena2005@gmail.com' }}" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Phone Number</label>
+                    <input type="text" name="phone" class="cv-input" value="{{ about.phone|default:'+91 7736998984' }}">
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Location</label>
+                    <input type="text" name="location" class="cv-input" value="{{ about.location|default:'Palakkad, Kerala' }}">
+                </div>
+            </div>
+
+            <div class="cv-grid-2">
+                <div class="cv-field-group">
+                    <label class="cv-label">LinkedIn Profile URL</label>
+                    <input type="url" name="linkedin_url" class="cv-input" value="{{ about.linkedin_url|default:'' }}">
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">GitHub Profile URL</label>
+                    <input type="url" name="github_url" class="cv-input" value="{{ about.github_url|default:'' }}">
+                </div>
+            </div>
+
+            <div class="cv-form-footer">
+                <button type="submit" class="cv-btn cv-btn-primary">
+                    <span>💾 Save Personal Information</span>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- ==========================================
+         2. PROFESSIONAL SUMMARY
+         ========================================== -->
+    <section id="professional-summary" class="cv-card-section">
+        <div class="cv-card-header">
+            <div class="cv-card-title-group">
+                <span class="cv-sec-num">02</span>
+                <div>
+                    <h2 class="cv-sec-title">Professional Summary</h2>
+                    <p class="cv-sec-desc">Executive elevator pitch and career summary featured at the top of your CV.</p>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}" class="cv-form-block">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_summary">
+
+            <div class="cv-field-group">
+                <label class="cv-label">Summary Statement</label>
+                <textarea name="summary" class="cv-textarea" rows="5" required>{{ cv_summary.summary|default:'' }}</textarea>
+                <span class="cv-hint">Tip: Highlight hands-on technologies (Python, Django, React, MySQL) and your unique strengths.</span>
+            </div>
+
+            <div class="cv-form-footer">
+                <button type="submit" class="cv-btn cv-btn-primary">
+                    <span>💾 Save Professional Summary</span>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- ==========================================
+         3. SKILLS
+         ========================================== -->
+    <section id="skills" class="cv-card-section">
+        <div class="cv-card-header">
+            <div class="cv-card-title-group">
+                <span class="cv-sec-num">03</span>
+                <div>
+                    <h2 class="cv-sec-title">Skills & Proficiencies</h2>
+                    <p class="cv-sec-desc">Technical proficiencies, programming languages, frameworks, and tools.</p>
+                </div>
+            </div>
+            <a href="{% url 'admin:api_skill_add' %}?next={{ request.path }}%23skills" class="cv-btn cv-btn-add">
+                <span>+ Add Skill</span>
+            </a>
+        </div>
+
+        <div class="cv-table-wrap">
+            <table class="cv-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">Order</th>
+                        <th>Skill Name</th>
+                        <th>Category</th>
+                        <th>Proficiency</th>
+                        <th>Status</th>
+                        <th style="width: 170px; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in skills %}
+                    <tr>
+                        <td>
+                            <div class="cv-order-cell">
+                                <span class="cv-order-badge">{{ item.order }}</span>
+                                <div class="cv-reorder-btns">
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="skill">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="up">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Up">▲</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="skill">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="down">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Down">▼</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <strong class="cv-item-title"><a href="{% url 'admin:api_skill_change' item.id %}?next={{ request.path }}%23skills" class="cv-item-title-link">{{ item.name }}</a></strong>
+                            {% if item.description %}
+                            <div class="cv-item-sub">{{ item.description }}</div>
+                            {% endif %}
+                        </td>
+                        <td><span class="cv-cat-pill">{{ item.get_category_display }}</span></td>
+                        <td>
+                            <div class="cv-prof-wrap">
+                                <span class="cv-prof-text">{{ item.proficiency }}%</span>
+                                <div class="cv-prof-bar"><div class="cv-prof-fill" style="width: {{ item.proficiency }}%;"></div></div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if item.is_learning %}
+                            <span class="cv-tag-learning">Learning ({{ item.learning_progress }}%)</span>
+                            {% else %}
+                            <span class="cv-tag-active">Active</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="cv-row-actions">
+                                <a href="{% url 'admin:api_skill_change' item.id %}?next={{ request.path }}%23skills" class="cv-btn-action cv-btn-edit">✏ Edit</a>
+                                <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;" onsubmit="return confirm('Delete skill \'{{ item.name|escapejs }}\'?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_skill">
+                                    <input type="hidden" name="skill_id" value="{{ item.id }}">
+                                    <button type="submit" class="cv-btn-action cv-btn-del">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="cv-empty-row">No skills listed yet. Click <strong>+ Add Skill</strong> above to add one.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         4. PROJECTS
+         ========================================== -->
+    <section id="projects" class="cv-card-section">
+        <div class="cv-card-header">
+            <div class="cv-card-title-group">
+                <span class="cv-sec-num">04</span>
+                <div>
+                    <h2 class="cv-sec-title">Projects</h2>
+                    <p class="cv-sec-desc">Key web applications, full-stack developments, and portfolio projects.</p>
+                </div>
+            </div>
+            <a href="{% url 'admin:api_project_add' %}?next={{ request.path }}%23projects" class="cv-btn cv-btn-add">
+                <span>+ Add Project</span>
+            </a>
+        </div>
+
+        <div class="cv-table-wrap">
+            <table class="cv-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">Order</th>
+                        <th style="width: 60px;">Num</th>
+                        <th>Project Title & Subtitle</th>
+                        <th>Technologies</th>
+                        <th>Featured</th>
+                        <th style="width: 170px; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in projects %}
+                    <tr>
+                        <td>
+                            <div class="cv-order-cell">
+                                <span class="cv-order-badge">{{ item.order }}</span>
+                                <div class="cv-reorder-btns">
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="project">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="up">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Up">▲</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="project">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="down">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Down">▼</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="cv-proj-num">{{ item.project_number }}</span></td>
+                        <td>
+                            <strong class="cv-item-title"><a href="{% url 'admin:api_project_change' item.id %}?next={{ request.path }}%23projects" class="cv-item-title-link">{{ item.title }}</a></strong>
+                            <div class="cv-item-sub">{{ item.subtitle }}</div>
+                        </td>
+                        <td><span class="cv-tech-tag">{{ item.technologies }}</span></td>
+                        <td>
+                            {% if item.featured %}<span class="cv-tag-active">Featured</span>{% else %}<span class="cv-tag-inactive">Standard</span>{% endif %}
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="cv-row-actions">
+                                <a href="{% url 'admin:api_project_change' item.id %}?next={{ request.path }}%23projects" class="cv-btn-action cv-btn-edit">✏ Edit</a>
+                                <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;" onsubmit="return confirm('Delete project \'{{ item.title|escapejs }}\'?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_project">
+                                    <input type="hidden" name="project_id" value="{{ item.id }}">
+                                    <button type="submit" class="cv-btn-action cv-btn-del">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="cv-empty-row">No projects listed yet. Click <strong>+ Add Project</strong> above to add one.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         5. COURSES & LEARNING
+         ========================================== -->
+    <section id="courses" class="cv-card-section">
+        <div class="cv-card-header">
+            <div class="cv-card-title-group">
+                <span class="cv-sec-num">05</span>
+                <div>
+                    <h2 class="cv-sec-title">Courses & Learning</h2>
+                    <p class="cv-sec-desc">Hands-on technical courses, bootcamps, and structured internships.</p>
+                </div>
+            </div>
+            <a href="{% url 'admin:api_cvcourse_add' %}?next={{ request.path }}%23courses" class="cv-btn cv-btn-add">
+                <span>+ Add Course</span>
+            </a>
+        </div>
+
+        <div class="cv-table-wrap">
+            <table class="cv-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">Order</th>
+                        <th>Course Name</th>
+                        <th>Organization / Academy</th>
+                        <th>Timeline</th>
+                        <th>Description</th>
+                        <th style="width: 170px; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in courses %}
+                    <tr>
+                        <td>
+                            <div class="cv-order-cell">
+                                <span class="cv-order-badge">{{ item.order }}</span>
+                                <div class="cv-reorder-btns">
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="course">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="up">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Up">▲</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="course">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="down">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Down">▼</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong class="cv-item-title"><a href="{% url 'admin:api_cvcourse_change' item.id %}?next={{ request.path }}%23courses" class="cv-item-title-link">{{ item.course_name }}</a></strong></td>
+                        <td>{{ item.organization }}</td>
+                        <td><span class="cv-time-badge">{{ item.start_date }} {% if item.end_date %}– {{ item.end_date }}{% endif %}</span></td>
+                        <td><span class="cv-item-desc-snippet">{{ item.description|truncatechars:100 }}</span></td>
+                        <td style="text-align: right;">
+                            <div class="cv-row-actions">
+                                <a href="{% url 'admin:api_cvcourse_change' item.id %}?next={{ request.path }}%23courses" class="cv-btn-action cv-btn-edit">✏ Edit</a>
+                                <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;" onsubmit="return confirm('Delete course \'{{ item.course_name|escapejs }}\'?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_course">
+                                    <input type="hidden" name="course_id" value="{{ item.id }}">
+                                    <button type="submit" class="cv-btn-action cv-btn-del">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="cv-empty-row">No courses listed yet. Click <strong>+ Add Course</strong> above to add one.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         6. EDUCATION
+         ========================================== -->
+    <section id="education" class="cv-card-section">
+        <div class="cv-card-header">
+            <div class="cv-card-title-group">
+                <span class="cv-sec-num">06</span>
+                <div>
+                    <h2 class="cv-sec-title">Education</h2>
+                    <p class="cv-sec-desc">Formal academic degrees, college qualifications, and higher secondary credentials.</p>
+                </div>
+            </div>
+            <a href="{% url 'admin:api_cveducation_add' %}?next={{ request.path }}%23education" class="cv-btn cv-btn-add">
+                <span>+ Add Education</span>
+            </a>
+        </div>
+
+        <div class="cv-table-wrap">
+            <table class="cv-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">Order</th>
+                        <th>Qualification / Degree</th>
+                        <th>Institution</th>
+                        <th>Location</th>
+                        <th>Years</th>
+                        <th style="width: 170px; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in education %}
+                    <tr>
+                        <td>
+                            <div class="cv-order-cell">
+                                <span class="cv-order-badge">{{ item.order }}</span>
+                                <div class="cv-reorder-btns">
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="education">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="up">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Up">▲</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="education">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="down">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Down">▼</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <strong class="cv-item-title"><a href="{% url 'admin:api_cveducation_change' item.id %}?next={{ request.path }}%23education" class="cv-item-title-link">{{ item.qualification }}</a></strong>
+                            {% if item.description %}
+                            <div class="cv-item-sub">{{ item.description }}</div>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.institution }}</td>
+                        <td>{{ item.location }}</td>
+                        <td><span class="cv-time-badge">{{ item.start_year }} {% if item.end_year %}– {{ item.end_year }}{% endif %}</span></td>
+                        <td style="text-align: right;">
+                            <div class="cv-row-actions">
+                                <a href="{% url 'admin:api_cveducation_change' item.id %}?next={{ request.path }}%23education" class="cv-btn-action cv-btn-edit">✏ Edit</a>
+                                <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;" onsubmit="return confirm('Delete education \'{{ item.qualification|escapejs }}\'?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_education">
+                                    <input type="hidden" name="education_id" value="{{ item.id }}">
+                                    <button type="submit" class="cv-btn-action cv-btn-del">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="cv-empty-row">No education entries listed yet. Click <strong>+ Add Education</strong> above to add one.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         7. CERTIFICATIONS
+         ========================================== -->
+    <section id="certifications" class="cv-card-section">
+        <div class="cv-card-header">
+            <div class="cv-card-title-group">
+                <span class="cv-sec-num">07</span>
+                <div>
+                    <h2 class="cv-sec-title">Certifications</h2>
+                    <p class="cv-sec-desc">Professional certificates, credentials, and verification IDs.</p>
+                </div>
+            </div>
+            <a href="{% url 'admin:api_cvcertification_add' %}?next={{ request.path }}%23certifications" class="cv-btn cv-btn-add">
+                <span>+ Add Certification</span>
+            </a>
+        </div>
+
+        <div class="cv-table-wrap">
+            <table class="cv-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">Order</th>
+                        <th>Certification Name</th>
+                        <th>Issuing Organization</th>
+                        <th>Date / Duration</th>
+                        <th>Certificate No.</th>
+                        <th style="width: 170px; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in certifications %}
+                    <tr>
+                        <td>
+                            <div class="cv-order-cell">
+                                <span class="cv-order-badge">{{ item.order }}</span>
+                                <div class="cv-reorder-btns">
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="certification">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="up">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Up">▲</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="certification">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="down">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Down">▼</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <strong class="cv-item-title"><a href="{% url 'admin:api_cvcertification_change' item.id %}?next={{ request.path }}%23certifications" class="cv-item-title-link">{{ item.name }}</a></strong>
+                            {% if item.certificate_url %}
+                            <div><a href="{{ item.certificate_url }}" target="_blank" class="cv-link-ext">View Credential ↗</a></div>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.organization }}</td>
+                        <td><span class="cv-time-badge">{{ item.date_or_duration }}</span></td>
+                        <td><code>{{ item.certificate_number|default:'—' }}</code></td>
+                        <td style="text-align: right;">
+                            <div class="cv-row-actions">
+                                <a href="{% url 'admin:api_cvcertification_change' item.id %}?next={{ request.path }}%23certifications" class="cv-btn-action cv-btn-edit">✏ Edit</a>
+                                <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;" onsubmit="return confirm('Delete certification \'{{ item.name|escapejs }}\'?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_certification">
+                                    <input type="hidden" name="cert_id" value="{{ item.id }}">
+                                    <button type="submit" class="cv-btn-action cv-btn-del">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="cv-empty-row">No certifications listed yet. Click <strong>+ Add Certification</strong> above to add one.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         8. LANGUAGES
+         ========================================== -->
+    <section id="languages" class="cv-card-section">
+        <div class="cv-card-header">
+            <div class="cv-card-title-group">
+                <span class="cv-sec-num">08</span>
+                <div>
+                    <h2 class="cv-sec-title">Languages</h2>
+                    <p class="cv-sec-desc">Spoken and written language fluencies.</p>
+                </div>
+            </div>
+            <a href="{% url 'admin:api_cvlanguage_add' %}?next={{ request.path }}%23languages" class="cv-btn cv-btn-add">
+                <span>+ Add Language</span>
+            </a>
+        </div>
+
+        <div class="cv-table-wrap">
+            <table class="cv-table">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">Order</th>
+                        <th>Language</th>
+                        <th>Proficiency Level</th>
+                        <th style="width: 170px; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in languages %}
+                    <tr>
+                        <td>
+                            <div class="cv-order-cell">
+                                <span class="cv-order-badge">{{ item.order }}</span>
+                                <div class="cv-reorder-btns">
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="language">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="up">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Up">▲</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="reorder_item">
+                                        <input type="hidden" name="model_name" value="language">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="direction" value="down">
+                                        <button type="submit" class="cv-btn-icon-subtle" title="Move Down">▼</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong class="cv-item-title"><a href="{% url 'admin:api_cvlanguage_change' item.id %}?next={{ request.path }}%23languages" class="cv-item-title-link">{{ item.language }}</a></strong></td>
+                        <td><span class="cv-cat-pill">{{ item.proficiency }}</span></td>
+                        <td style="text-align: right;">
+                            <div class="cv-row-actions">
+                                <a href="{% url 'admin:api_cvlanguage_change' item.id %}?next={{ request.path }}%23languages" class="cv-btn-action cv-btn-edit">✏ Edit</a>
+                                <form method="POST" action="{% url 'admin:api_resume_changelist' %}" style="display:inline;" onsubmit="return confirm('Delete language \'{{ item.language|escapejs }}\'?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_language">
+                                    <input type="hidden" name="language_id" value="{{ item.id }}">
+                                    <button type="submit" class="cv-btn-action cv-btn-del">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="cv-empty-row">No languages listed yet. Click <strong>+ Add Language</strong> above to add one.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         CV DOCUMENT (PDF) FILE MANAGEMENT
+         ========================================== -->
+    <section id="cv-document" class="cv-card-section">
+        <div class="cv-card-header">
+            <div class="cv-card-title-group">
+                <span class="cv-sec-num">📄</span>
+                <div>
+                    <h2 class="cv-sec-title">CV / Resume Document (PDF)</h2>
+                    <p class="cv-sec-desc">Upload or replace your official PDF file provided dynamically to all "Download CV" buttons across the portfolio.</p>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}" enctype="multipart/form-data" class="cv-form-block">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="upload_cv_pdf">
+
+            <div class="cv-grid-2">
+                <div class="cv-field-group">
+                    <label class="cv-label">Document Title</label>
+                    <input type="text" name="title" class="cv-input" value="{{ resume.title|default:'Jeseena - Full Stack Developer CV' }}">
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Upload New PDF File</label>
+                    <input type="file" name="file" class="cv-file-input" accept=".pdf">
+                    <span class="cv-hint">Current: {% if resume.file %}<a href="{{ resume.file.url }}" target="_blank" class="cv-link-ext">{{ resume.file.name }} ↗</a>{% else %}None uploaded yet{% endif %}</span>
+                </div>
+            </div>
+
+            <div class="cv-form-footer" style="display: flex; gap: 0.8rem; align-items: center;">
+                <button type="submit" class="cv-btn cv-btn-primary">
+                    <span>📤 Upload / Save PDF</span>
+                </button>
+                {% if resume and resume.id %}
+                <a href="{% url 'admin:api_resume_change' resume.id %}?next={{ request.path }}%23cv-document" class="cv-btn cv-btn-subtle" style="text-decoration: none;">
+                    <span>✏ Edit Full Document Record</span>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </section>
+
+</div>
+
+<!-- ============================================================
+     MODALS FOR ADD & EDIT
+     ============================================================ -->
+
+<!-- Modal: Add Skill -->
+<div id="modal-add-skill" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-add-skill')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>+ Add New Skill</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-add-skill')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_skill">
+            <div class="cv-modal-body">
+                <div class="cv-field-group">
+                    <label class="cv-label">Skill Name *</label>
+                    <input type="text" name="name" class="cv-input" placeholder="e.g. Python, React, PostgreSQL" required>
+                </div>
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Category</label>
+                        <select name="category" class="cv-select">
+                            <option value="BACKEND">Backend Development</option>
+                            <option value="FRONTEND">Frontend Development</option>
+                            <option value="DATABASE">Database Systems</option>
+                            <option value="TOOLS">Tools & Platforms</option>
+                        </select>
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">Proficiency (0 - 100)%</label>
+                        <input type="number" name="proficiency" class="cv-input" value="80" min="0" max="100">
+                    </div>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Short Description (for CV)</label>
+                    <input type="text" name="description" class="cv-input" placeholder="e.g. Writes clean, efficient code for backend logic">
+                </div>
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Display Order</label>
+                        <input type="number" name="order" class="cv-input" value="1" min="1">
+                    </div>
+                    <div class="cv-field-group" style="padding-top: 1.8rem;">
+                        <label class="cv-checkbox-label">
+                            <input type="checkbox" name="is_learning">
+                            <span>Currently Learning</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-add-skill')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Save Skill</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Edit Skill -->
+<div id="modal-edit-skill" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-edit-skill')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>Edit Skill</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-edit-skill')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit_skill">
+            <input type="hidden" name="skill_id" id="edit-skill-id">
+            <div class="cv-modal-body">
+                <div class="cv-field-group">
+                    <label class="cv-label">Skill Name *</label>
+                    <input type="text" name="name" id="edit-skill-name" class="cv-input" required>
+                </div>
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Category</label>
+                        <select name="category" id="edit-skill-category" class="cv-select">
+                            <option value="BACKEND">Backend Development</option>
+                            <option value="FRONTEND">Frontend Development</option>
+                            <option value="DATABASE">Database Systems</option>
+                            <option value="TOOLS">Tools & Platforms</option>
+                        </select>
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">Proficiency (0 - 100)%</label>
+                        <input type="number" name="proficiency" id="edit-skill-proficiency" class="cv-input" min="0" max="100">
+                    </div>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Short Description (for CV)</label>
+                    <input type="text" name="description" id="edit-skill-description" class="cv-input">
+                </div>
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Display Order</label>
+                        <input type="number" name="order" id="edit-skill-order" class="cv-input" min="1">
+                    </div>
+                    <div class="cv-field-group" style="padding-top: 1.8rem;">
+                        <label class="cv-checkbox-label">
+                            <input type="checkbox" name="is_learning" id="edit-skill-is-learning">
+                            <span>Currently Learning</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-edit-skill')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Update Skill</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Add Project -->
+<div id="modal-add-project" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-add-project')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>+ Add New Project</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-add-project')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_project">
+            <div class="cv-modal-body">
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Project Number (e.g. 01, 02)</label>
+                        <input type="text" name="project_number" class="cv-input" value="01" required>
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">Display Order</label>
+                        <input type="number" name="order" class="cv-input" value="1" min="1">
+                    </div>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Project Title *</label>
+                    <input type="text" name="title" class="cv-input" placeholder="e.g. CareNova – Medical Store System" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Subtitle / Category</label>
+                    <input type="text" name="subtitle" class="cv-input" placeholder="e.g. Full Stack Web Application">
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Technologies (Comma-separated)</label>
+                    <input type="text" name="technologies" class="cv-input" placeholder="e.g. Python, Django, MySQL" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Detailed Summary</label>
+                    <textarea name="description" class="cv-textarea" rows="3" placeholder="Detailed project summary"></textarea>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Key Features (One per line)</label>
+                    <textarea name="features" class="cv-textarea" rows="3" placeholder="Feature 1&#10;Feature 2&#10;Feature 3"></textarea>
+                </div>
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">GitHub URL</label>
+                        <input type="url" name="github_url" class="cv-input" placeholder="https://github.com/...">
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">Live Demo URL</label>
+                        <input type="url" name="live_url" class="cv-input" placeholder="https://...">
+                    </div>
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-add-project')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Save Project</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Edit Project -->
+<div id="modal-edit-project" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-edit-project')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>Edit Project</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-edit-project')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit_project">
+            <input type="hidden" name="project_id" id="edit-project-id">
+            <div class="cv-modal-body">
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Project Number</label>
+                        <input type="text" name="project_number" id="edit-project-number" class="cv-input" required>
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">Display Order</label>
+                        <input type="number" name="order" id="edit-project-order" class="cv-input" min="1">
+                    </div>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Project Title *</label>
+                    <input type="text" name="title" id="edit-project-title" class="cv-input" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Subtitle</label>
+                    <input type="text" name="subtitle" id="edit-project-subtitle" class="cv-input">
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Technologies</label>
+                    <input type="text" name="technologies" id="edit-project-technologies" class="cv-input" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Detailed Summary</label>
+                    <textarea name="description" id="edit-project-description" class="cv-textarea" rows="3"></textarea>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Key Features (One per line)</label>
+                    <textarea name="features" id="edit-project-features" class="cv-textarea" rows="3"></textarea>
+                </div>
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">GitHub URL</label>
+                        <input type="url" name="github_url" id="edit-project-github-url" class="cv-input">
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">Live Demo URL</label>
+                        <input type="url" name="live_url" id="edit-project-live-url" class="cv-input">
+                    </div>
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-edit-project')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Update Project</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Add Course -->
+<div id="modal-add-course" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-add-course')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>+ Add Course & Learning</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-add-course')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_course">
+            <div class="cv-modal-body">
+                <div class="cv-field-group">
+                    <label class="cv-label">Course Name *</label>
+                    <input type="text" name="course_name" class="cv-input" placeholder="e.g. Full Stack Development with Internship" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Organization / Academy *</label>
+                    <input type="text" name="organization" class="cv-input" placeholder="e.g. Safe Technologies" required>
+                </div>
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Start Date</label>
+                        <input type="text" name="start_date" class="cv-input" placeholder="e.g. Jul 2025">
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">End Date</label>
+                        <input type="text" name="end_date" class="cv-input" placeholder="e.g. Mar 2026">
+                    </div>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Description / Learnings</label>
+                    <textarea name="description" class="cv-textarea" rows="3" placeholder="Key topics covered, projects built during the course"></textarea>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Display Order</label>
+                    <input type="number" name="order" class="cv-input" value="1" min="1">
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-add-course')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Save Course</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Edit Course -->
+<div id="modal-edit-course" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-edit-course')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>Edit Course & Learning</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-edit-course')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit_course">
+            <input type="hidden" name="course_id" id="edit-course-id">
+            <div class="cv-modal-body">
+                <div class="cv-field-group">
+                    <label class="cv-label">Course Name *</label>
+                    <input type="text" name="course_name" id="edit-course-name" class="cv-input" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Organization / Academy *</label>
+                    <input type="text" name="organization" id="edit-course-org" class="cv-input" required>
+                </div>
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Start Date</label>
+                        <input type="text" name="start_date" id="edit-course-start" class="cv-input">
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">End Date</label>
+                        <input type="text" name="end_date" id="edit-course-end" class="cv-input">
+                    </div>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Description / Learnings</label>
+                    <textarea name="description" id="edit-course-desc" class="cv-textarea" rows="3"></textarea>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Display Order</label>
+                    <input type="number" name="order" id="edit-course-order" class="cv-input" min="1">
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-edit-course')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Update Course</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Add Education -->
+<div id="modal-add-education" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-add-education')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>+ Add Education</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-add-education')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_education">
+            <div class="cv-modal-body">
+                <div class="cv-field-group">
+                    <label class="cv-label">Degree / Qualification *</label>
+                    <input type="text" name="qualification" class="cv-input" placeholder="e.g. Bachelor of Arts in Functional English" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Institution / College *</label>
+                    <input type="text" name="institution" class="cv-input" placeholder="e.g. Govt. Arts & Science College, Nattukal" required>
+                </div>
+                <div class="cv-grid-3">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Location</label>
+                        <input type="text" name="location" class="cv-input" placeholder="e.g. Kerala">
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">Start Year</label>
+                        <input type="text" name="start_year" class="cv-input" placeholder="e.g. 2022">
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">End Year</label>
+                        <input type="text" name="end_year" class="cv-input" placeholder="e.g. 2025">
+                    </div>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Description / Achievements</label>
+                    <textarea name="description" class="cv-textarea" rows="2" placeholder="Academic focus, analytical skills, honors"></textarea>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Display Order</label>
+                    <input type="number" name="order" class="cv-input" value="1" min="1">
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-add-education')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Save Education</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Edit Education -->
+<div id="modal-edit-education" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-edit-education')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>Edit Education</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-edit-education')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit_education">
+            <input type="hidden" name="education_id" id="edit-education-id">
+            <div class="cv-modal-body">
+                <div class="cv-field-group">
+                    <label class="cv-label">Degree / Qualification *</label>
+                    <input type="text" name="qualification" id="edit-education-qual" class="cv-input" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Institution / College *</label>
+                    <input type="text" name="institution" id="edit-education-inst" class="cv-input" required>
+                </div>
+                <div class="cv-grid-3">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Location</label>
+                        <input type="text" name="location" id="edit-education-loc" class="cv-input">
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">Start Year</label>
+                        <input type="text" name="start_year" id="edit-education-start" class="cv-input">
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">End Year</label>
+                        <input type="text" name="end_year" id="edit-education-end" class="cv-input">
+                    </div>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Description / Achievements</label>
+                    <textarea name="description" id="edit-education-desc" class="cv-textarea" rows="2"></textarea>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Display Order</label>
+                    <input type="number" name="order" id="edit-education-order" class="cv-input" min="1">
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-edit-education')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Update Education</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Add Certification -->
+<div id="modal-add-certification" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-add-certification')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>+ Add Certification</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-add-certification')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_certification">
+            <div class="cv-modal-body">
+                <div class="cv-field-group">
+                    <label class="cv-label">Certification Title *</label>
+                    <input type="text" name="name" class="cv-input" placeholder="e.g. Python Full Stack Development with Internship" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Issuing Organization *</label>
+                    <input type="text" name="organization" class="cv-input" placeholder="e.g. Safe Technologies" required>
+                </div>
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Date or Duration</label>
+                        <input type="text" name="date_or_duration" class="cv-input" placeholder="e.g. Jul 2025 - Mar 2026">
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">Certificate ID / Number</label>
+                        <input type="text" name="certificate_number" class="cv-input" placeholder="e.g. StC 5179">
+                    </div>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Credential Verification URL</label>
+                    <input type="url" name="certificate_url" class="cv-input" placeholder="https://...">
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Display Order</label>
+                    <input type="number" name="order" class="cv-input" value="1" min="1">
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-add-certification')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Save Certification</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Edit Certification -->
+<div id="modal-edit-certification" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-edit-certification')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>Edit Certification</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-edit-certification')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit_certification">
+            <input type="hidden" name="cert_id" id="edit-cert-id">
+            <div class="cv-modal-body">
+                <div class="cv-field-group">
+                    <label class="cv-label">Certification Title *</label>
+                    <input type="text" name="name" id="edit-cert-name" class="cv-input" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Issuing Organization *</label>
+                    <input type="text" name="organization" id="edit-cert-org" class="cv-input" required>
+                </div>
+                <div class="cv-grid-2">
+                    <div class="cv-field-group">
+                        <label class="cv-label">Date or Duration</label>
+                        <input type="text" name="date_or_duration" id="edit-cert-date" class="cv-input">
+                    </div>
+                    <div class="cv-field-group">
+                        <label class="cv-label">Certificate ID / Number</label>
+                        <input type="text" name="certificate_number" id="edit-cert-num" class="cv-input">
+                    </div>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Credential Verification URL</label>
+                    <input type="url" name="certificate_url" id="edit-cert-url" class="cv-input">
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Display Order</label>
+                    <input type="number" name="order" id="edit-cert-order" class="cv-input" min="1">
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-edit-certification')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Update Certification</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Add Language -->
+<div id="modal-add-language" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-add-language')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>+ Add Language</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-add-language')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_language">
+            <div class="cv-modal-body">
+                <div class="cv-field-group">
+                    <label class="cv-label">Language Name *</label>
+                    <input type="text" name="language" class="cv-input" placeholder="e.g. English, Malayalam, Tamil" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Proficiency Level *</label>
+                    <input type="text" name="proficiency" class="cv-input" placeholder="e.g. Native, Conversational, Professional" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Display Order</label>
+                    <input type="number" name="order" class="cv-input" value="1" min="1">
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-add-language')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Save Language</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Edit Language -->
+<div id="modal-edit-language" class="cv-modal-backdrop" onclick="handleBackdropClick(event, 'modal-edit-language')">
+    <div class="cv-modal-content">
+        <div class="cv-modal-header">
+            <h3>Edit Language</h3>
+            <button type="button" class="cv-modal-close" onclick="closeModal('modal-edit-language')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'admin:api_resume_changelist' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit_language">
+            <input type="hidden" name="language_id" id="edit-language-id">
+            <div class="cv-modal-body">
+                <div class="cv-field-group">
+                    <label class="cv-label">Language Name *</label>
+                    <input type="text" name="language" id="edit-language-name" class="cv-input" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Proficiency Level *</label>
+                    <input type="text" name="proficiency" id="edit-language-prof" class="cv-input" required>
+                </div>
+                <div class="cv-field-group">
+                    <label class="cv-label">Display Order</label>
+                    <input type="number" name="order" id="edit-language-order" class="cv-input" min="1">
+                </div>
+            </div>
+            <div class="cv-modal-footer">
+                <button type="button" class="cv-btn cv-btn-subtle" onclick="closeModal('modal-edit-language')">Cancel</button>
+                <button type="submit" class="cv-btn cv-btn-primary">Update Language</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Styles & JavaScript for Modals -->
+<style>
+.cv-mgmt-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0.5rem 0.5rem 3rem;
+}
+.cv-item-title-link {
+    color: #f87171 !important;
+    text-decoration: none !important;
+    font-weight: 600;
+    transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+.cv-item-title-link:hover {
+    color: #fca5a5 !important;
+    text-decoration: underline !important;
+}
+.cv-btn-action.cv-btn-edit {
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.cv-btn-add {
+    text-decoration: none !important;
+}
+
+/* Header */
+.cv-header-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #18181c, #101014);
+    border: 1px solid #27272a;
+    border-left: 4px solid #d32f2f;
+    border-radius: 8px;
+    padding: 1.5rem 1.8rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+    flex-wrap: wrap;
+    gap: 1.2rem;
+}
+.cv-badge {
+    display: inline-block;
+    background: rgba(211, 47, 47, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(211, 47, 47, 0.4);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    margin-bottom: 0.4rem;
+}
+.cv-main-title {
+    margin: 0 0 0.3rem;
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+.cv-main-subtitle {
+    margin: 0;
+    color: #a1a1aa;
+    font-size: 0.88rem;
+}
+.cv-header-actions {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+}
+.btn-cv-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: all 0.2s;
+}
+.btn-cv-view {
+    background: #27272a;
+    color: #ffffff !important;
+    border: 1px solid #3f3f46;
+}
+.btn-cv-view:hover { background: #3f3f46; }
+.btn-cv-upload {
+    background: linear-gradient(135deg, #d32f2f, #991b1b);
+    color: #ffffff !important;
+}
+.btn-cv-upload:hover { opacity: 0.9; }
+
+/* Quick Nav */
+.cv-quick-nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0.6rem 0.8rem;
+    background: #141418;
+    border: 1px solid #27272a;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.cv-nav-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.75rem;
+    background: #1c1c22;
+    color: #d4d4d8 !important;
+    border: 1px solid #2e2e34;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none !important;
+    transition: all 0.2s;
+}
+.cv-nav-pill:hover {
+    background: #27272a;
+    color: #ffffff !important;
+    border-color: #d32f2f;
+}
+
+/* Messages */
+.cv-messages-wrap { margin-bottom: 1.2rem; }
+.cv-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    background: #064e3b;
+    border: 1px solid #059669;
+    color: #ecfdf5;
+    font-size: 0.88rem;
+    margin-bottom: 0.5rem;
+}
+.cv-alert-icon { font-weight: bold; }
+
+/* Card Section */
+.cv-card-section {
+    background: #151518;
+    border: 1px solid #27272a;
+    border-radius: 8px;
+    padding: 1.5rem 1.8rem;
+    margin-bottom: 1.8rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.cv-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #27272a;
+    padding-bottom: 1rem;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.cv-card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+.cv-sec-num {
+    background: #27272a;
+    color: #ef4444;
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid #3f3f46;
+}
+.cv-sec-title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+.cv-sec-desc {
+    margin: 0.2rem 0 0;
+    color: #a1a1aa;
+    font-size: 0.82rem;
+}
+
+/* Forms & Inputs */
+.cv-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.cv-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.cv-field-group {
+    margin-bottom: 0.8rem;
+}
+.cv-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #d4d4d8;
+    margin-bottom: 0.35rem;
+    letter-spacing: 0.02em;
+}
+.cv-input, .cv-select, .cv-textarea, .cv-file-input {
+    width: 100%;
+    padding: 0.55rem 0.8rem;
+    background: #0a0a0c;
+    border: 1px solid #3f3f46;
+    border-radius: 4px;
+    color: #f4f4f5;
+    font-size: 0.88rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+.cv-input:focus, .cv-select:focus, .cv-textarea:focus {
+    border-color: #d32f2f;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.25);
+}
+.cv-hint {
+    display: block;
+    font-size: 0.76rem;
+    color: #71717a;
+    margin-top: 0.3rem;
+}
+.cv-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 0.8rem;
+}
+.cv-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #e4e4e7;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* Buttons */
+.cv-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+.cv-btn-primary {
+    background: linear-gradient(135deg, #d32f2f, #991b1b);
+    color: #ffffff;
+}
+.cv-btn-primary:hover { opacity: 0.9; }
+.cv-btn-add {
+    background: #1e3a8a;
+    color: #ffffff;
+    border: 1px solid #2563eb;
+}
+.cv-btn-add:hover { background: #2563eb; }
+.cv-btn-subtle {
+    background: #27272a;
+    color: #d4d4d8;
+    border: 1px solid #3f3f46;
+}
+.cv-btn-subtle:hover { background: #3f3f46; color: #ffffff; }
+
+/* Table */
+.cv-table-wrap {
+    overflow-x: auto;
+}
+.cv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+.cv-table th {
+    background: #1a1a20;
+    color: #a1a1aa;
+    text-align: left;
+    padding: 0.7rem 0.8rem;
+    font-weight: 600;
+    border-bottom: 2px solid #27272a;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.cv-table td {
+    padding: 0.75rem 0.8rem;
+    border-bottom: 1px solid #222227;
+    color: #e4e4e7;
+    vertical-align: middle;
+}
+.cv-table tr:hover td {
+    background: #18181f;
+}
+.cv-empty-row {
+    text-align: center;
+    color: #71717a;
+    padding: 2rem 1rem !important;
+}
+
+/* Cell Elements */
+.cv-order-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.cv-order-badge {
+    background: #27272a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 3px;
+    font-family: monospace;
+}
+.cv-reorder-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.cv-btn-icon-subtle {
+    background: transparent;
+    border: none;
+    color: #71717a;
+    font-size: 0.65rem;
+    padding: 0 0.2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+.cv-btn-icon-subtle:hover { color: #ffffff; }
+.cv-item-title {
+    color: #ffffff;
+    display: block;
+}
+.cv-item-sub {
+    font-size: 0.76rem;
+    color: #a1a1aa;
+    margin-top: 0.15rem;
+}
+.cv-item-desc-snippet {
+    font-size: 0.78rem;
+    color: #94a3b8;
+}
+.cv-cat-pill {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    color: #d4d4d8;
+}
+.cv-tech-tag {
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    color: #93c5fd;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+}
+.cv-time-badge {
+    font-size: 0.78rem;
+    color: #cbd5e1;
+    font-family: monospace;
+}
+.cv-proj-num {
+    font-family: monospace;
+    font-weight: 700;
+    color: #ef4444;
+}
+.cv-tag-active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.cv-tag-learning {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.cv-tag-inactive {
+    background: #27272a;
+    color: #a1a1aa;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+}
+.cv-prof-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.cv-prof-text {
+    font-size: 0.78rem;
+    font-family: monospace;
+    width: 32px;
+}
+.cv-prof-bar {
+    width: 70px;
+    height: 6px;
+    background: #27272a;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.cv-prof-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #d32f2f, #ef4444);
+    border-radius: 3px;
+}
+.cv-row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.4rem;
+}
+.cv-btn-action {
+    padding: 0.25rem 0.65rem;
+    border-radius: 3px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.cv-btn-edit {
+    background: #271216 !important;
+    color: #fca5a5 !important;
+    border: 1px solid #ef4444 !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    text-decoration: none !important;
+}
+.cv-btn-edit:hover {
+    background: #d32f2f !important;
+    color: #ffffff !important;
+    border-color: #f87171 !important;
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.45) !important;
+    transform: translateY(-1px) !important;
+}
+.cv-btn-del {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+.cv-btn-del:hover {
+    background: #ef4444;
+    color: #ffffff;
+}
+.cv-link-ext {
+    color: #f87171;
+    text-decoration: underline;
+    font-size: 0.78rem;
+}
+.cv-link-ext:hover { color: #fca5a5; }
+
+/* Modals */
+.cv-modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    backdrop-filter: blur(4px);
+}
+.cv-modal-backdrop.is-open {
+    display: flex;
+}
+.cv-modal-content {
+    background: #18181c;
+    border: 1px solid #3f3f46;
+    border-top: 3px solid #d32f2f;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+.cv-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.4rem;
+    border-bottom: 1px solid #27272a;
+}
+.cv-modal-header h3 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 1.15rem;
+}
+.cv-modal-close {
+    background: transparent;
+    border: none;
+    color: #a1a1aa;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+}
+.cv-modal-close:hover { color: #ffffff; }
+.cv-modal-body {
+    padding: 1.4rem;
+}
+.cv-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding: 1rem 1.4rem;
+    border-top: 1px solid #27272a;
+    background: #141418;
+}
+
+/* =========================================================================
+   LIGHT THEME FOR RESUME / CV MANAGEMENT PORTAL
+   High-contrast, clean white theme with 100% visibility for all elements
+   ========================================================================= */
+
+[data-theme="light"] .cv-mgmt-container,
+html.admin-light-mode .cv-mgmt-container {
+    color: #0f172a !important;
+}
+
+/* Header Banner */
+[data-theme="light"] .cv-header-banner,
+html.admin-light-mode .cv-header-banner {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-left: 4px solid #d32f2f !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .cv-badge,
+html.admin-light-mode .cv-badge {
+    background: #fee2e2 !important;
+    color: #b91c1c !important;
+    border: 1px solid #fca5a5 !important;
+}
+
+[data-theme="light"] .cv-main-title,
+html.admin-light-mode .cv-main-title {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .cv-main-subtitle,
+html.admin-light-mode .cv-main-subtitle {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .btn-cv-view,
+html.admin-light-mode .btn-cv-view {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .btn-cv-view:hover,
+html.admin-light-mode .btn-cv-view:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+/* Quick Nav Anchor Strip */
+[data-theme="light"] .cv-quick-nav,
+html.admin-light-mode .cv-quick-nav {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .cv-nav-pill,
+html.admin-light-mode .cv-nav-pill {
+    background: #f8fafc !important;
+    color: #334155 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .cv-nav-pill:hover,
+html.admin-light-mode .cv-nav-pill:hover {
+    background: #fee2e2 !important;
+    color: #b91c1c !important;
+    border-color: #f87171 !important;
+}
+
+/* Alert Messages */
+[data-theme="light"] .cv-alert,
+html.admin-light-mode .cv-alert {
+    background: #ecfdf5 !important;
+    border: 1px solid #a7f3d0 !important;
+    color: #065f46 !important;
+}
+
+/* Section Cards */
+[data-theme="light"] .cv-card-section,
+html.admin-light-mode .cv-card-section {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="light"] .cv-card-header,
+html.admin-light-mode .cv-card-header {
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+[data-theme="light"] .cv-sec-num,
+html.admin-light-mode .cv-sec-num {
+    background: #fee2e2 !important;
+    color: #b91c1c !important;
+    border: 1px solid #fca5a5 !important;
+}
+
+[data-theme="light"] .cv-sec-title,
+html.admin-light-mode .cv-sec-title {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .cv-sec-desc,
+html.admin-light-mode .cv-sec-desc {
+    color: #64748b !important;
+}
+
+/* Form Controls */
+[data-theme="light"] .cv-label,
+html.admin-light-mode .cv-label {
+    color: #334155 !important;
+}
+
+[data-theme="light"] .cv-input,
+[data-theme="light"] .cv-select,
+[data-theme="light"] .cv-textarea,
+[data-theme="light"] .cv-file-input,
+html.admin-light-mode .cv-input,
+html.admin-light-mode .cv-select,
+html.admin-light-mode .cv-textarea,
+html.admin-light-mode .cv-file-input {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .cv-input:focus,
+[data-theme="light"] .cv-select:focus,
+[data-theme="light"] .cv-textarea:focus,
+html.admin-light-mode .cv-input:focus,
+html.admin-light-mode .cv-select:focus,
+html.admin-light-mode .cv-textarea:focus {
+    border-color: #d32f2f !important;
+    box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2) !important;
+}
+
+[data-theme="light"] .cv-hint,
+html.admin-light-mode .cv-hint {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .cv-checkbox-label,
+html.admin-light-mode .cv-checkbox-label {
+    color: #334155 !important;
+}
+
+/* Button Variants */
+[data-theme="light"] .cv-btn-subtle,
+html.admin-light-mode .cv-btn-subtle {
+    background: #f1f5f9 !important;
+    color: #334155 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .cv-btn-subtle:hover,
+html.admin-light-mode .cv-btn-subtle:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .cv-btn-add,
+html.admin-light-mode .cv-btn-add {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid #1d4ed8 !important;
+}
+
+[data-theme="light"] .cv-btn-add:hover,
+html.admin-light-mode .cv-btn-add:hover {
+    background: #1d4ed8 !important;
+}
+
+/* Tables */
+[data-theme="light"] .cv-table,
+html.admin-light-mode .cv-table {
+    background: #ffffff !important;
+}
+
+[data-theme="light"] .cv-table th,
+html.admin-light-mode .cv-table th {
+    background: #f8fafc !important;
+    color: #475569 !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .cv-table td,
+html.admin-light-mode .cv-table td {
+    background: #ffffff !important;
+    color: #1e293b !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+[data-theme="light"] .cv-table tr:hover td,
+html.admin-light-mode .cv-table tr:hover td {
+    background: #f8fafc !important;
+}
+
+[data-theme="light"] .cv-empty-row,
+html.admin-light-mode .cv-empty-row {
+    color: #94a3b8 !important;
+}
+
+/* Cell Elements & Badges */
+[data-theme="light"] .cv-order-badge,
+html.admin-light-mode .cv-order-badge {
+    background: #f1f5f9 !important;
+    color: #334155 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .cv-btn-icon-subtle,
+html.admin-light-mode .cv-btn-icon-subtle {
+    color: #94a3b8 !important;
+}
+
+[data-theme="light"] .cv-btn-icon-subtle:hover,
+html.admin-light-mode .cv-btn-icon-subtle:hover {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .cv-item-title,
+html.admin-light-mode .cv-item-title {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .cv-item-title-link,
+html.admin-light-mode .cv-item-title-link {
+    color: #b91c1c !important;
+}
+
+[data-theme="light"] .cv-item-title-link:hover,
+html.admin-light-mode .cv-item-title-link:hover {
+    color: #dc2626 !important;
+}
+
+[data-theme="light"] .cv-item-sub,
+html.admin-light-mode .cv-item-sub {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .cv-item-desc-snippet,
+html.admin-light-mode .cv-item-desc-snippet {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .cv-cat-pill,
+html.admin-light-mode .cv-cat-pill {
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+}
+
+[data-theme="light"] .cv-tech-tag,
+html.admin-light-mode .cv-tech-tag {
+    background: #eff6ff !important;
+    border: 1px solid #bfdbfe !important;
+    color: #1d4ed8 !important;
+}
+
+[data-theme="light"] .cv-time-badge,
+html.admin-light-mode .cv-time-badge {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .cv-proj-num,
+html.admin-light-mode .cv-proj-num {
+    color: #b91c1c !important;
+}
+
+[data-theme="light"] .cv-tag-active,
+html.admin-light-mode .cv-tag-active {
+    background: #dcfce7 !important;
+    color: #15803d !important;
+}
+
+[data-theme="light"] .cv-tag-learning,
+html.admin-light-mode .cv-tag-learning {
+    background: #fef3c7 !important;
+    color: #b45309 !important;
+}
+
+[data-theme="light"] .cv-tag-inactive,
+html.admin-light-mode .cv-tag-inactive {
+    background: #f1f5f9 !important;
+    color: #64748b !important;
+}
+
+[data-theme="light"] .cv-prof-bar,
+html.admin-light-mode .cv-prof-bar {
+    background: #e2e8f0 !important;
+}
+
+[data-theme="light"] .cv-prof-text,
+html.admin-light-mode .cv-prof-text {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .cv-btn-edit,
+html.admin-light-mode .cv-btn-edit {
+    background: #fee2e2 !important;
+    color: #b91c1c !important;
+    border: 1px solid #fca5a5 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .cv-btn-edit:hover,
+html.admin-light-mode .cv-btn-edit:hover {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    border-color: #b91c1c !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3) !important;
+}
+
+[data-theme="light"] .cv-btn-del,
+html.admin-light-mode .cv-btn-del {
+    background: #fef2f2 !important;
+    color: #dc2626 !important;
+    border: 1px solid #fecaca !important;
+}
+
+[data-theme="light"] .cv-btn-del:hover,
+html.admin-light-mode .cv-btn-del:hover {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .cv-link-ext,
+html.admin-light-mode .cv-link-ext {
+    color: #b91c1c !important;
+}
+
+[data-theme="light"] .cv-link-ext:hover,
+html.admin-light-mode .cv-link-ext:hover {
+    color: #dc2626 !important;
+}
+
+[data-theme="light"] code,
+html.admin-light-mode code {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 0.15rem 0.35rem !important;
+    border-radius: 3px !important;
+}
+
+/* Modals */
+[data-theme="light"] .cv-modal-backdrop,
+html.admin-light-mode .cv-modal-backdrop {
+    background: rgba(15, 23, 42, 0.5) !important;
+}
+
+[data-theme="light"] .cv-modal-content,
+html.admin-light-mode .cv-modal-content {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-top: 3px solid #d32f2f !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+[data-theme="light"] .cv-modal-header,
+html.admin-light-mode .cv-modal-header {
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+[data-theme="light"] .cv-modal-header h3,
+html.admin-light-mode .cv-modal-header h3 {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .cv-modal-close,
+html.admin-light-mode .cv-modal-close {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .cv-modal-close:hover,
+html.admin-light-mode .cv-modal-close:hover {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .cv-modal-footer,
+html.admin-light-mode .cv-modal-footer {
+    background: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+</style>
+
+<script>
+function openAddModal(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.add('is-open');
+}
+
+function closeModal(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('is-open');
+}
+
+function handleBackdropClick(e, id) {
+    if (e.target.id === id) {
+        closeModal(id);
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.cv-modal-backdrop.is-open').forEach(function(m) {
+            m.classList.remove('is-open');
+        });
+    }
+});
+
+// Edit Skill Modal Prefill
+function openEditSkillModal(id, name, cat, prof, desc, icon, isLearning, progress, note, order) {
+    document.getElementById('edit-skill-id').value = id;
+    document.getElementById('edit-skill-name').value = name;
+    document.getElementById('edit-skill-category').value = cat;
+    document.getElementById('edit-skill-proficiency').value = prof;
+    document.getElementById('edit-skill-description').value = desc;
+    document.getElementById('edit-skill-is-learning').checked = isLearning;
+    document.getElementById('edit-skill-order').value = order;
+    openAddModal('modal-edit-skill');
+}
+
+// Edit Project Modal Prefill
+function openEditProjectModal(id, num, title, sub, tech, desc, feat, gh, live, featFlag, order) {
+    document.getElementById('edit-project-id').value = id;
+    document.getElementById('edit-project-number').value = num;
+    document.getElementById('edit-project-title').value = title;
+    document.getElementById('edit-project-subtitle').value = sub;
+    document.getElementById('edit-project-technologies').value = tech;
+    document.getElementById('edit-project-description').value = desc;
+    document.getElementById('edit-project-features').value = feat;
+    document.getElementById('edit-project-github-url').value = gh;
+    document.getElementById('edit-project-live-url').value = live;
+    document.getElementById('edit-project-order').value = order;
+    openAddModal('modal-edit-project');
+}
+
+// Edit Course Modal Prefill
+function openEditCourseModal(id, name, org, start, end, desc, order) {
+    document.getElementById('edit-course-id').value = id;
+    document.getElementById('edit-course-name').value = name;
+    document.getElementById('edit-course-org').value = org;
+    document.getElementById('edit-course-start').value = start;
+    document.getElementById('edit-course-end').value = end;
+    document.getElementById('edit-course-desc').value = desc;
+    document.getElementById('edit-course-order').value = order;
+    openAddModal('modal-edit-course');
+}
+
+// Edit Education Modal Prefill
+function openEditEducationModal(id, qual, inst, loc, start, end, desc, order) {
+    document.getElementById('edit-education-id').value = id;
+    document.getElementById('edit-education-qual').value = qual;
+    document.getElementById('edit-education-inst').value = inst;
+    document.getElementById('edit-education-loc').value = loc;
+    document.getElementById('edit-education-start').value = start;
+    document.getElementById('edit-education-end').value = end;
+    document.getElementById('edit-education-desc').value = desc;
+    document.getElementById('edit-education-order').value = order;
+    openAddModal('modal-edit-education');
+}
+
+// Edit Certification Modal Prefill
+function openEditCertificationModal(id, name, org, date, num, url, order) {
+    document.getElementById('edit-cert-id').value = id;
+    document.getElementById('edit-cert-name').value = name;
+    document.getElementById('edit-cert-org').value = org;
+    document.getElementById('edit-cert-date').value = date;
+    document.getElementById('edit-cert-num').value = num;
+    document.getElementById('edit-cert-url').value = url;
+    document.getElementById('edit-cert-order').value = order;
+    openAddModal('modal-edit-certification');
+}
+
+// Edit Language Modal Prefill
+function openEditLanguageModal(id, lang, prof, order) {
+    document.getElementById('edit-language-id').value = id;
+    document.getElementById('edit-language-name').value = lang;
+    document.getElementById('edit-language-prof').value = prof;
+    document.getElementById('edit-language-order').value = order;
+    openAddModal('modal-edit-language');
+}
+</script>
+{% endblock %}
