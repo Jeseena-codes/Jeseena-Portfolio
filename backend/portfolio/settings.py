@@ -94,17 +94,6 @@ DATABASES = {
         },
     },
 }
-# Quick test if MySQL is reachable; if not, fall back to SQLite to prevent startup crashes
-try:
-    import MySQLdb
-    conn = MySQLdb.connect(host=DB_HOST, port=int(DB_PORT), user=DB_USER, passwd=DB_PASSWORD, connect_timeout=2)
-    conn.close()
-except Exception:
-    # Graceful fallback if MySQL is stopped
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
