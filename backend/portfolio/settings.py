@@ -68,18 +68,32 @@ DB_PASSWORD = os.environ.get('PORTFOLIO_DB_PASSWORD', '')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
-        'HOST': DB_HOST,
-        'PORT': DB_PORT,
+        'NAME': 'defaultdb',
+        'USER': 'avnadmin',
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': 'mysql-31a6ddd-jeseena2005-f923.l.aivencloud.com',
+        'PORT': '20003',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'ssl': {
+                'ssl-mode': 'REQUIRED',
+            },
+        },
+    },
+
+    'local': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'portfolio_db',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '3307',
         'OPTIONS': {
             'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        }
-    }
+        },
+    },
 }
-
 # Quick test if MySQL is reachable; if not, fall back to SQLite to prevent startup crashes
 try:
     import MySQLdb
