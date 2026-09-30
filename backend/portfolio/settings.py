@@ -95,6 +95,13 @@ DATABASES = {
     },
 }
 
+import hashlib
+
+db_password = os.getenv('DB_PASSWORD', '')
+
+print("RENDER DB PASSWORD LENGTH:", len(db_password))
+print("RENDER DB PASSWORD SHA256:", hashlib.sha256(db_password.encode()).hexdigest())
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
