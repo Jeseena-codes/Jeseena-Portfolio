@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import defaultProfilePhoto from '../assets/profile.png';
 
 /**
  * Profile3D - Large Cutout 3D Portrait with Depth, Floating & Parallax
@@ -15,7 +16,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
  * - Responsive: smooth tilt on desktop, gentle reduced motion on tablet, touch-safe on mobile
  */
 export default function Profile3D({
-  src = '/images/profile.png',
+  src = defaultProfilePhoto,
   alt = 'Jeseena - Full Stack Developer',
   className = '',
 }) {
@@ -24,8 +25,22 @@ export default function Profile3D({
   const glareRef = useRef(null);
   const glowRef = useRef(null);
 
-  const [imgError, setImgError] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState(src || defaultProfilePhoto || '/images/profile.png');
   const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    setCurrentSrc(src || defaultProfilePhoto || '/images/profile.png');
+  }, [src]);
+
+  const handleImageError = () => {
+    if (currentSrc !== defaultProfilePhoto && defaultProfilePhoto) {
+      setCurrentSrc(defaultProfilePhoto);
+    } else if (currentSrc !== '/images/profile.png') {
+      setCurrentSrc('/images/profile.png');
+    } else if (currentSrc !== '/images/profile.jpg') {
+      setCurrentSrc('/images/profile.jpg');
+    }
+  };
 
   // Animation values (current & target for smooth lerp)
   const currentTransform = useRef({
@@ -295,53 +310,27 @@ export default function Profile3D({
             zIndex: 2,
           }}
         >
-          {!imgError ? (
-            <img
-              src={src}
-              alt={alt}
-              onError={() => setImgError(true)}
-              className="hero-profile-cutout-img"
-              style={{
-                width: '100%',
-                maxWidth: '290px',
-                height: 'auto',
-                maxHeight: '380px',
-                objectFit: 'contain',
-                objectPosition: 'center bottom',
-                filter: isHovered
-                  ? 'contrast(1.05) brightness(1.02) drop-shadow(0 20px 38px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 30px rgba(211, 47, 47, 0.32))'
-                  : 'contrast(1.04) brightness(1.01) drop-shadow(0 15px 28px rgba(0, 0, 0, 0.68)) drop-shadow(0 0 22px rgba(211, 47, 47, 0.18))',
-                display: 'block',
-                pointerEvents: 'none',
-                userSelect: 'none',
-                transition: 'filter 0.4s ease',
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                width: '100%',
-                maxWidth: '380px',
-                height: '420px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '2rem',
-                textAlign: 'center',
-              }}
-            >
-              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#D32F2F" strokeWidth="1.5">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              <p style={{ marginTop: '0.8rem', fontSize: '0.75rem', color: '#A0A0A0' }}>
-                Profile Photo Slot:
-                <br />
-                <code>{src}</code>
-              </p>
-            </div>
-          )}
+          <img
+            src={currentSrc}
+            alt={alt}
+            onError={handleImageError}
+            className="hero-profile-cutout-img"
+            style={{
+              width: '100%',
+              maxWidth: '290px',
+              height: 'auto',
+              maxHeight: '380px',
+              objectFit: 'contain',
+              objectPosition: 'center bottom',
+              filter: isHovered
+                ? 'contrast(1.05) brightness(1.02) drop-shadow(0 20px 38px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 30px rgba(211, 47, 47, 0.32))'
+                : 'contrast(1.04) brightness(1.01) drop-shadow(0 15px 28px rgba(0, 0, 0, 0.68)) drop-shadow(0 0 22px rgba(211, 47, 47, 0.18))',
+              display: 'block',
+              pointerEvents: 'none',
+              userSelect: 'none',
+              transition: 'filter 0.4s ease',
+            }}
+          />
         </div>
 
         {/* Layer 3 (Front, translateZ: 38px): Dynamic Specular Light / Glare */}

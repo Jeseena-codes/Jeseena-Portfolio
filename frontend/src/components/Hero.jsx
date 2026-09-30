@@ -1,6 +1,7 @@
 import React from 'react';
 import Profile3D from './Profile3D';
 import TextRepel from './TextRepel';
+import profilePhoto from '../assets/profile.png';
 
 export default function Hero({ about }) {
   const name = about?.name || 'JESEENA J';
@@ -9,7 +10,7 @@ export default function Hero({ about }) {
     "Aspiring Full Stack Developer with hands-on training in Python, Django, and front-end technologies, backed by a strong foundation in written communication and analytical thinking from a background in English Language and Communication. Built a complete medical store management web application during an internship, covering both front-end and back-end development. Eager to apply strong problem-solving skills and attention to detail to a full-time development role."
   );
   const location = about?.location || 'PALAKKAD, KERALA';
-  const photoUrl = '/images/profile.png';
+  const photoUrl = profilePhoto || '/images/profile.png';
   const email = about?.email || 'jeseena2005@gmail.com';
   const github = about?.github_url || 'https://github.com/Jeseena-codes';
   const linkedin = about?.linkedin_url || 'https://linkedin.com/in/jeseena-j-48a126336';

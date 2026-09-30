@@ -14,7 +14,7 @@ export const FALLBACK_ABOUT = {
   phone: '+91 7736998984',
   github_url: 'https://github.com/Jeseena-codes',
   linkedin_url: 'https://linkedin.com/in/jeseena-j-48a126336',
-  display_photo: 'images/profile.jpg',
+  display_photo: '/images/profile.png',
   years_old: '21+',
   featured_projects_count: '3',
   hero_watermark: 'PORTFOLIO',
