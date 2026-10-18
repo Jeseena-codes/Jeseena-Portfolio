@@ -36,6 +36,7 @@ class ContactFormEmailNotificationTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data.get('success'))
         self.assertTrue(response.data.get('data', {}).get('email_sent'))
+        self.assertIsNone(response.data.get('data', {}).get('email_error_code'))
 
         # Check DB persistence
         msg = ContactMessage.objects.filter(email='sarah@example.com').first()
@@ -78,6 +79,7 @@ class ContactFormEmailNotificationTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data.get('success'))
         self.assertFalse(response.data.get('data', {}).get('email_sent'))
+        self.assertEqual(response.data.get('data', {}).get('email_error_code'), 'smtp_send_failed')
 
         # DB record must still exist
         msg = ContactMessage.objects.filter(email='sarah@example.com').first()
@@ -99,7 +101,7 @@ class ContactFormEmailNotificationTests(TestCase):
         When CONTACT_NOTIFICATION_EMAIL and EMAIL_HOST_USER are not configured:
         1. The ContactMessage is safely saved in DB.
         2. Email sending is skipped with a warning log.
-        3. API response indicates email_sent=False without raising an error.
+        3. API response indicates email_sent=False and email_error_code='missing_recipient'.
         4. No email is sent.
         """
         with self.assertLogs('api.views', level='WARNING') as cm:
@@ -108,9 +110,32 @@ class ContactFormEmailNotificationTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data.get('success'))
         self.assertFalse(response.data.get('data', {}).get('email_sent'))
+        self.assertEqual(response.data.get('data', {}).get('email_error_code'), 'missing_recipient')
         self.assertEqual(ContactMessage.objects.filter(email='sarah@example.com').count(), 1)
         self.assertEqual(len(mail.outbox), 0)
         self.assertTrue(any("CONTACT_NOTIFICATION_EMAIL is not configured" in line for line in cm.output))
+
+    @override_settings(
+        EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+        CONTACT_NOTIFICATION_EMAIL='admin@example.com',
+        EMAIL_HOST_USER='',
+        DEFAULT_FROM_EMAIL='',
+    )
+    def test_contact_message_skips_when_sender_not_configured(self):
+        """
+        When CONTACT_NOTIFICATION_EMAIL is set but DEFAULT_FROM_EMAIL and EMAIL_HOST_USER are empty:
+        email sending is skipped with email_error_code='missing_sender'.
+        """
+        with self.assertLogs('api.views', level='WARNING') as cm:
+            response = self.client.post(self.contact_url, self.valid_payload, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(response.data.get('success'))
+        self.assertFalse(response.data.get('data', {}).get('email_sent'))
+        self.assertEqual(response.data.get('data', {}).get('email_error_code'), 'missing_sender')
+        self.assertEqual(ContactMessage.objects.filter(email='sarah@example.com').count(), 1)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertTrue(any("DEFAULT_FROM_EMAIL or EMAIL_HOST_USER is not configured" in line for line in cm.output))
 
     @override_settings(
         EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend',
@@ -121,7 +146,7 @@ class ContactFormEmailNotificationTests(TestCase):
     def test_contact_message_skips_when_smtp_host_empty(self):
         """
         When using SMTP backend but EMAIL_HOST is empty, email sending
-        should be skipped cleanly with a warning to avoid hanging connection timeouts.
+        should be skipped cleanly with email_error_code='missing_host'.
         """
         with self.assertLogs('api.views', level='WARNING') as cm:
             response = self.client.post(self.contact_url, self.valid_payload, format='json')
@@ -129,6 +154,7 @@ class ContactFormEmailNotificationTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data.get('success'))
         self.assertFalse(response.data.get('data', {}).get('email_sent'))
+        self.assertEqual(response.data.get('data', {}).get('email_error_code'), 'missing_host')
         self.assertEqual(ContactMessage.objects.filter(email='sarah@example.com').count(), 1)
         self.assertTrue(any("EMAIL_HOST is not configured" in line for line in cm.output))
 

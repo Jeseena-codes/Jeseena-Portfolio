@@ -176,6 +176,7 @@ class ContactMessageCreateView(APIView):
 
             # Attempt to send notification email (non-blocking: DB save is retained if email fails)
             email_sent = False
+            email_error_code = None
             recipient = (
                 getattr(settings, 'CONTACT_NOTIFICATION_EMAIL', '')
                 or getattr(settings, 'EMAIL_HOST_USER', '')
@@ -190,16 +191,19 @@ class ContactMessageCreateView(APIView):
             email_host = (getattr(settings, 'EMAIL_HOST', '') or '').strip()
 
             if not recipient:
+                email_error_code = 'missing_recipient'
                 logger.warning(
                     "Email notification skipped for contact message ID %s: CONTACT_NOTIFICATION_EMAIL is not configured.",
                     message.id
                 )
             elif not from_email:
+                email_error_code = 'missing_sender'
                 logger.warning(
                     "Email notification skipped for contact message ID %s: DEFAULT_FROM_EMAIL or EMAIL_HOST_USER is not configured.",
                     message.id
                 )
             elif is_smtp and not email_host:
+                email_error_code = 'missing_host'
                 logger.warning(
                     "Email notification skipped for contact message ID %s: EMAIL_HOST is not configured.",
                     message.id
@@ -242,6 +246,7 @@ class ContactMessageCreateView(APIView):
                         fail_silently=False,
                     )
                     email_sent = True
+                    email_error_code = None
                     logger.info(
                         "Notification email dispatched successfully for contact message ID %s to %s",
                         message.id,
@@ -249,6 +254,7 @@ class ContactMessageCreateView(APIView):
                     )
                 except Exception as mail_exc:
                     email_sent = False
+                    email_error_code = 'smtp_send_failed'
                     logger.error(
                         "Failed to dispatch notification email for contact message ID %s via SMTP (%s:%s): [%s] %s",
                         message.id,
@@ -267,6 +273,7 @@ class ContactMessageCreateView(APIView):
                     'name': message.name,
                     'created_at': message.created_at,
                     'email_sent': email_sent,
+                    'email_error_code': email_error_code,
                 }
             }, status=status.HTTP_201_CREATED)
 
