@@ -45,15 +45,23 @@ export default function Contact({ about }) {
 
     try {
       const res = await sendContactMessage(formData);
-      if (res.success) {
-        setStatus({ type: 'success', text: res.message || 'Thank you! Your message has been saved into MySQL.' });
+      if (res && res.success) {
+        setStatus({
+          type: 'success',
+          text: res.message || 'Thank you! Your message has been saved into MySQL successfully. Jeseena will get back to you soon.'
+        });
         setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
-        setStatus({ type: 'error', text: 'Error submitting message. Please check input fields.' });
+        setStatus({
+          type: 'error',
+          text: res?.message || 'Error submitting message. Please check input fields and try again.'
+        });
       }
     } catch (err) {
-      setStatus({ type: 'success', text: `Thank you ${formData.name}! Your message has been recorded.` });
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setStatus({
+        type: 'error',
+        text: err.message || 'Failed to send message. Please check your internet connection or email directly.'
+      });
     } finally {
       setLoading(false);
     }

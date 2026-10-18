@@ -81,30 +81,30 @@ export default function Projects({ about }) {
       const mm = window.gsap.matchMedia();
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Clean Entrance: Smooth fade in for already-split cards
-      window.gsap.fromTo(
-        panels,
-        {
-          opacity: 0,
-          y: 20,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          stagger: 0.06,
-          duration: 0.6,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-            once: true,
-          },
-        }
-      );
-
       // Desktop layout (min-width: 992px)
       mm.add('(min-width: 992px)', () => {
+        // Clean Entrance: Smooth fade in for already-split cards
+        window.gsap.fromTo(
+          panels,
+          {
+            opacity: 0,
+            y: 20,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.06,
+            duration: 0.6,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: section,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+              once: true,
+            },
+          }
+        );
+
         if (prefersReducedMotion) {
           window.gsap.set(flippers, { rotateY: 180, z: 0 });
           window.gsap.set(frontFaces, { pointerEvents: 'none' });
@@ -235,10 +235,36 @@ export default function Projects({ about }) {
 
       // Mobile / Tablet layout (max-width: 991px): Clean responsive stack
       mm.add('(max-width: 991px)', () => {
-        window.gsap.set(panels, { x: 0, y: 0, rotateZ: 0, scale: 1 });
-        window.gsap.set(flippers, { rotateY: 180, z: 0 });
+        window.gsap.set(panels, {
+          clearProps: 'all',
+          opacity: 1,
+          visibility: 'visible',
+          x: 0,
+          y: 0,
+          rotateX: 0,
+          rotateY: 0,
+          rotateZ: 0,
+          scale: 1,
+        });
+        window.gsap.set(flippers, {
+          clearProps: 'all',
+          opacity: 1,
+          visibility: 'visible',
+          rotateY: 0,
+          rotateX: 0,
+          rotateZ: 0,
+          x: 0,
+          y: 0,
+          transform: 'none',
+        });
         window.gsap.set(frontFaces, { pointerEvents: 'none' });
-        window.gsap.set(backFaces, { pointerEvents: 'auto' });
+        window.gsap.set(backFaces, {
+          clearProps: 'transform,opacity,visibility',
+          pointerEvents: 'auto',
+          opacity: 1,
+          visibility: 'visible',
+          transform: 'none',
+        });
       });
     }, sectionRef);
 

@@ -1,6 +1,20 @@
 // API Service connecting React frontend to Django REST API backend
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
+const getApiBaseUrl = () => {
+  if (import.meta.env?.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
+  }
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://127.0.0.1:8000/api';
+    }
+  }
+  return '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
 
 // Built-in fallback data matching official CV specifications
 export const FALLBACK_ABOUT = {
@@ -369,8 +383,23 @@ export async function sendContactMessage(data) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  return await res.json();
+  const json = await res.json().catch(() => null);
+  if (!res.ok) {
+    let errorMsg = json?.message;
+    if (!errorMsg && json?.errors) {
+      if (typeof json.errors === 'string') {
+        errorMsg = json.errors;
+      } else if (typeof json.errors === 'object') {
+        errorMsg = Object.entries(json.errors)
+          .map(([field, errs]) => `${field}: ${Array.isArray(errs) ? errs.join(', ') : errs}`)
+          .join(' | ');
+      }
+    }
+    throw new Error(errorMsg || `Server responded with status ${res.status}. Failed to save message.`);
+  }
+  return json;
 }
+
 
 export async function getSocialLinks() {
   try {

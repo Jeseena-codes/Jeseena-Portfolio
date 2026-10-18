@@ -47,8 +47,10 @@ export default function App() {
     try {
       if (theme === 'light') {
         document.body.classList.add('light-theme');
+        document.documentElement.classList.add('light-theme');
       } else {
         document.body.classList.remove('light-theme');
+        document.documentElement.classList.remove('light-theme');
       }
       localStorage.setItem('portfolio-theme', theme);
     } catch (e) {}

@@ -1,9 +1,14 @@
+import logging
+from django.conf import settings
+from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import connection
 from django.shortcuts import redirect
 from .models import About, Project, Skill, Service, Journey, WorkProcess, ContactMessage, Resume, SocialLink
+
+logger = logging.getLogger(__name__)
 from .serializers import (
     AboutSerializer,
     ProjectSerializer,
@@ -161,24 +166,76 @@ class WorkProcessListView(APIView):
 
 class ContactMessageCreateView(APIView):
     """
-    Receives contact form submissions from the React frontend
-    and saves them into the MySQL database.
+    Receives contact form submissions from the React frontend,
+    saves them into the MySQL database, and dispatches an email notification.
     """
     def post(self, request):
         serializer = ContactMessageSerializer(data=request.data)
         if serializer.is_valid():
             message = serializer.save()
+
+            # Attempt to send notification email (non-blocking: DB save is retained if email fails)
+            email_sent = False
+            recipient = (
+                getattr(settings, 'CONTACT_NOTIFICATION_EMAIL', None)
+                or getattr(settings, 'EMAIL_HOST_USER', None)
+                or 'jeseena2005@gmail.com'
+            )
+            email_user = getattr(settings, 'EMAIL_HOST_USER', None)
+            email_pwd = getattr(settings, 'EMAIL_HOST_PASSWORD', None)
+
+            if email_user and email_pwd:
+                try:
+                    subject = f"[Portfolio Contact] New message from {message.name}: {message.subject}"
+                    timestamp = message.created_at.strftime('%Y-%m-%d %H:%M:%S UTC') if message.created_at else 'Just now'
+                    body = (
+                        f"You have received a new contact inquiry through your portfolio website.\n\n"
+                        f"--------------------------------------------------\n"
+                        f"SENDER DETAILS:\n"
+                        f"• Name:       {message.name}\n"
+                        f"• Email:      {message.email}\n"
+                        f"• Subject:    {message.subject}\n"
+                        f"• Received:   {timestamp}\n"
+                        f"• Status:     Unread (New)\n\n"
+                        f"--------------------------------------------------\n"
+                        f"MESSAGE CONTENT:\n"
+                        f"{message.message}\n\n"
+                        f"--------------------------------------------------\n"
+                        f"You can view, read, and manage this message in your Django Admin Inbox:\n"
+                        f"/admin/api/contactmessage/{message.id}/change/\n"
+                    )
+                    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or email_user
+                    send_mail(
+                        subject=subject,
+                        message=body,
+                        from_email=from_email,
+                        recipient_list=[recipient],
+                        fail_silently=False,
+                    )
+                    email_sent = True
+                    logger.info("Notification email dispatched successfully for contact message ID %s", message.id)
+                except Exception as mail_exc:
+                    logger.error("Failed to dispatch notification email for message ID %s: %s", message.id, str(mail_exc))
+            else:
+                logger.info(
+                    "Email notification skipped for message ID %s: EMAIL_HOST_USER / EMAIL_HOST_PASSWORD not configured.",
+                    message.id
+                )
+
             return Response({
                 'success': True,
-                'message': f"Thank you {message.name}! Your message has been saved to the MySQL database. Jeseena will get back to you soon.",
+                'message': f"Thank you {message.name}! Your message has been saved successfully. Jeseena will get back to you soon.",
                 'data': {
                     'id': message.id,
                     'name': message.name,
-                    'created_at': message.created_at
+                    'created_at': message.created_at,
+                    'email_sent': email_sent,
                 }
             }, status=status.HTTP_201_CREATED)
+
         return Response({
             'success': False,
+            'message': 'Please correct the errors in the form.',
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 

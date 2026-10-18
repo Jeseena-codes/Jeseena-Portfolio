@@ -406,9 +406,9 @@ img {
   background: linear-gradient(
     115deg,
     #ffffff 0%,
-    #ffffff 38%,
+    #ffffff 44%,
     var(--crimson-bright) 50%,
-    #ffffff 62%,
+    #ffffff 56%,
     #ffffff 100%
   );
   background-size: 240% 100%;
@@ -739,9 +739,9 @@ img {
 
 /* Light Theme Support */
 body.light-theme .card-face {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06) !important;
 }
 
 body.light-theme .front-info,
@@ -764,23 +764,137 @@ body.light-theme .project-one-line-desc {
 
 /* Mobile & Tablet Responsiveness */
 @media (max-width: 991px) {
+  .projects-section,
+  .scroll-split-section {
+    padding: 3.5rem 0 3rem;
+    overflow: visible;
+  }
+
+  .scroll-split-stage {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .scroll-split-container {
+    display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.8rem !important;
+    gap: 2rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .scroll-split-card {
+    flex: 0 0 auto !important;
+    max-width: 440px !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 410px !important;
+    border-radius: 16px !important;
+    transform: none !important;
+    perspective: none !important;
+    -webkit-perspective: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+
+  .card-flipper {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 410px !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    transform-style: flat !important;
+    -webkit-transform-style: flat !important;
+    border-radius: 16px !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .card-face-front {
+    display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+
+  .card-face-back {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 410px !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    backface-visibility: visible !important;
+    -webkit-backface-visibility: visible !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+    pointer-events: auto !important;
+    border-radius: 16px !important;
+  }
+
+  .back-media {
+    position: relative !important;
+    width: 100% !important;
+    height: 200px !important;
+    min-height: 190px !important;
+    overflow: hidden !important;
+    display: block !important;
+  }
+
+  .back-media img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .back-info {
+    position: relative !important;
+    width: 100% !important;
+    min-height: 210px !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .projects-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .projects-section-title {
+    font-size: 1.3rem;
   }
 
   .scroll-split-card {
     max-width: 100% !important;
-    width: 100% !important;
-    height: 400px !important;
-    border-radius: 16px !important;
-    transform: none !important;
   }
 
-  .card-face,
-  .card-flipper {
-    border-radius: 16px !important;
+  .back-info {
+    padding: 1.15rem 1.1rem 1.25rem !important;
+  }
+
+  .modal-overlay {
+    padding: 4.5rem 1rem 1.5rem !important;
+  }
+
+  .modal-content {
+    padding: 2rem 1.35rem 1.6rem !important;
   }
 }
 
@@ -846,8 +960,8 @@ body.light-theme .project-one-line-desc {
   left: 0;
   width: 100%;
   height: 0%;
-  background: linear-gradient(180deg, var(--crimson-bright) 0%, #ff4d6d 60%, var(--crimson-bright) 100%);
-  box-shadow: 0 0 14px rgba(211, 47, 47, 0.85);
+  background: linear-gradient(180deg, var(--crimson-primary) 0%, var(--crimson-bright) 50%, var(--crimson-accent) 100%);
+  box-shadow: 0 0 14px var(--crimson-glow);
   border-radius: 999px;
   will-change: height;
 }
@@ -1168,8 +1282,8 @@ body.light-theme .project-one-line-desc {
   left: 0;
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--crimson-bright) 0%, #ff4d6d 50%, var(--crimson-bright) 100%);
-  box-shadow: 0 0 12px rgba(211, 47, 47, 0.7);
+  background: linear-gradient(90deg, var(--crimson-primary) 0%, var(--crimson-bright) 50%, var(--crimson-primary) 100%);
+  box-shadow: 0 0 12px var(--crimson-glow);
   border-radius: 999px;
   transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -2944,7 +3058,7 @@ body.light-theme .process-step-desc {
 }
 
 .btn-cta-hire:hover {
-  background: #e63946;
+  background: var(--crimson-accent);
   box-shadow: 0 4px 16px var(--crimson-glow);
   transform: translateY(-2px) scale(1.02);
 }
@@ -3020,9 +3134,9 @@ body.light-theme .process-step-desc {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #ff4d6d;
-  background: rgba(176, 0, 32, 0.2);
-  border: 1px solid rgba(229, 9, 20, 0.4);
+  color: var(--crimson-bright);
+  background: rgba(176, 0, 32, 0.22);
+  border: 1px solid rgba(211, 47, 47, 0.45);
   padding: 0.35rem 0.85rem;
   border-radius: 20px;
 }
@@ -3031,8 +3145,8 @@ body.light-theme .process-step-desc {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #ff4d6d;
-  box-shadow: 0 0 10px #ff4d6d;
+  background: var(--crimson-bright);
+  box-shadow: 0 0 10px var(--crimson-glow);
   animation: pulseDot 2s infinite ease-in-out;
 }
 
@@ -3128,9 +3242,9 @@ body.light-theme .process-step-desc {
   text-transform: uppercase;
   padding: 0.25rem 0.65rem;
   border-radius: 20px;
-  background: rgba(229, 9, 20, 0.15);
-  border: 1px solid rgba(229, 9, 20, 0.35);
-  color: #ff4d6d;
+  background: rgba(176, 0, 32, 0.18);
+  border: 1px solid rgba(211, 47, 47, 0.45);
+  color: var(--crimson-bright);
 }
 
 .learning-tech-subtitle {
@@ -3517,24 +3631,25 @@ body.light-theme .process-step-desc {
 /* ==========================================================================
    LIGHT THEME MODE (Toggled from Top Right Button)
    ========================================================================== */
+html.light-theme,
 body.light-theme {
-  --bg-color: #f8fafc;
+  --bg-color: #ffffff;
   --second-bg-color: #ffffff;
-  --bg-black: #f1f5f9;
-  --bg-dark: #f8fafc;
+  --bg-black: #ffffff;
+  --bg-dark: #ffffff;
   --bg-card: #ffffff;
   --main-color: #b91c1c;
-  --crimson-primary: #991b1b;
+  --crimson-primary: #8b0000;
   --crimson-bright: #b91c1c;
-  --crimson-accent: #991b1b;
+  --crimson-accent: #b00020;
   --crimson-glow: rgba(185, 28, 28, 0.2);
   --crimson-border: rgba(185, 28, 28, 0.35);
   --text-white: #0f172a;
   --text-gray: #475569;
   --text-dim: #64748b;
-  --border-light: rgba(0, 0, 0, 0.1);
+  --border-light: rgba(0, 0, 0, 0.09);
   --border-ultra-light: rgba(0, 0, 0, 0.06);
-  background-color: #f8fafc !important;
+  background-color: #ffffff !important;
   color: #0f172a !important;
 }
 
@@ -3578,12 +3693,12 @@ body.light-theme .theme-toggle-btn:hover {
 
 /* Hero Section */
 body.light-theme .hero-section {
-  background: radial-gradient(circle at 60% 35%, rgba(185, 28, 28, 0.08) 0%, transparent 60%), #f8fafc !important;
+  background: radial-gradient(circle at 60% 35%, rgba(185, 28, 28, 0.06) 0%, transparent 60%), #ffffff !important;
 }
 
 body.light-theme .hero-giant-bg {
-  color: rgba(30, 41, 59, 0.22) !important;
-  opacity: 1 !important;
+  color: #8b0000 !important;
+  opacity: 0.20 !important;
   text-shadow: none !important;
 }
 
@@ -3682,7 +3797,7 @@ body.light-theme .hero-portrait-container::after {
 /* About Section */
 body.light-theme .portfolio-section,
 body.light-theme #about {
-  background: #f8fafc !important;
+  background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -3823,7 +3938,7 @@ body.light-theme .btn-cta-cv:hover {
 
 /* What I Do Section */
 body.light-theme #services {
-  background: #f8fafc !important;
+  background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -3852,14 +3967,14 @@ body.light-theme .service-card-desc {
 }
 
 body.light-theme .service-tag-pill {
-  background: #f1f5f9 !important;
+  background: rgba(185, 28, 28, 0.08) !important;
   color: #b91c1c !important;
   border: 1px solid rgba(185, 28, 28, 0.2) !important;
 }
 
 /* Skills Section */
 body.light-theme #skills {
-  background: #f8fafc !important;
+  background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -3980,17 +4095,17 @@ body.light-theme .learning-status-pill {
 
 /* Technology Marquee Section */
 body.light-theme .tech-marquee-section {
-  background: #f1f5f9 !important;
+  background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
 body.light-theme .tech-marquee-section::before {
-  background: linear-gradient(to right, #f1f5f9 0%, transparent 100%) !important;
+  background: linear-gradient(to right, #ffffff 0%, transparent 100%) !important;
 }
 
 body.light-theme .tech-marquee-section::after {
-  background: linear-gradient(to left, #f1f5f9 0%, transparent 100%) !important;
+  background: linear-gradient(to left, #ffffff 0%, transparent 100%) !important;
 }
 
 body.light-theme .tech-marquee-svg[aria-label="GitHub"] path {
@@ -3999,7 +4114,7 @@ body.light-theme .tech-marquee-svg[aria-label="GitHub"] path {
 
 /* Journey / Education & Work Process Section */
 body.light-theme .middle-3col-section {
-  background: #f8fafc !important;
+  background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -4024,7 +4139,7 @@ body.light-theme .edu-year {
 }
 
 body.light-theme .middle-3col-section.journey-fullwidth-section {
-  background: #f8fafc !important;
+  background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -4214,7 +4329,7 @@ body.light-theme .glowing-timeline-node {
 
 /* Projects Section */
 body.light-theme .projects-section {
-  background: #f8fafc !important;
+  background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -4391,14 +4506,14 @@ body.light-theme .form-label {
 }
 
 body.light-theme .form-control {
-  background: #f8fafc !important;
+  background: #ffffff !important;
   border: 1px solid rgba(0, 0, 0, 0.12) !important;
   color: #0f172a !important;
 }
 
 /* Contact / Get In Touch Section */
 body.light-theme .contact-bottom-section {
-  background: #f8fafc !important;
+  background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -4442,7 +4557,7 @@ body.light-theme .contact-ref-val:hover {
 
 /* Inline Message Form Section */
 body.light-theme .contact-form-section {
-  background: #f1f5f9 !important;
+  background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -4466,7 +4581,7 @@ body.light-theme .contact-form-label {
 
 body.light-theme .contact-form-input,
 body.light-theme .contact-form-textarea {
-  background: #f8fafc !important;
+  background: #ffffff !important;
   border: 1px solid rgba(0, 0, 0, 0.14) !important;
   color: #0f172a !important;
 }
@@ -4481,7 +4596,7 @@ body.light-theme .contact-form-textarea:focus {
 /* Footer Section */
 body.light-theme footer,
 body.light-theme .footer-main {
-  background: #f8fafc !important;
+  background: #ffffff !important;
   border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
@@ -4710,8 +4825,8 @@ body.light-theme .footer-copy-text {
 
 .project-showcase-card:hover {
   transform: translateY(-8px);
-  border-color: #ff3333;
-  box-shadow: 0 12px 35px rgba(211, 47, 47, 0.5), inset 0 0 22px rgba(211, 47, 47, 0.12);
+  border-color: var(--crimson-bright);
+  box-shadow: 0 12px 35px var(--crimson-glow), inset 0 0 22px rgba(176, 0, 32, 0.12);
 }
 
 .project-card-image-wrap {
@@ -4805,9 +4920,9 @@ body.light-theme .footer-copy-text {
 }
 
 .project-card-review-btn:hover {
-  background: #ff2222;
+  background: var(--crimson-accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(211, 47, 47, 0.65);
+  box-shadow: 0 8px 25px var(--crimson-glow);
 }
 
 /* ==========================================================================
@@ -4907,15 +5022,15 @@ html.lenis body {
 }
 
 body.light-theme .profile3d-vignette {
-  background: linear-gradient(to bottom, transparent 65%, #f8fafc 100%) !important;
+  background: linear-gradient(to bottom, transparent 65%, #ffffff 100%) !important;
 }
 
 body.light-theme .profile3d-glow {
-  background: radial-gradient(ellipse at center, rgba(185, 28, 28, 0.3) 0%, rgba(185, 28, 28, 0.1) 45%, transparent 70%) !important;
+  background: radial-gradient(ellipse at center, rgba(185, 28, 28, 0.22) 0%, rgba(185, 28, 28, 0.08) 45%, transparent 70%) !important;
 }
 
 body.light-theme .profile3d-backdrop {
-  background: radial-gradient(circle at 50% 35%, rgba(185, 28, 28, 0.1) 0%, rgba(240, 240, 245, 0.5) 100%) !important;
+  background: radial-gradient(circle at 50% 35%, rgba(185, 28, 28, 0.08) 0%, transparent 70%) !important;
 }
 
 /* Light Theme: Popup Cards & Unified Journey */
@@ -4993,9 +5108,9 @@ body.light-theme .service-card-desc {
 }
 
 body.light-theme .service-tag-pill {
-  background: #f1f5f9 !important;
-  color: #334155 !important;
-  border-color: rgba(0, 0, 0, 0.06) !important;
+  background: rgba(185, 28, 28, 0.08) !important;
+  color: #b91c1c !important;
+  border: 1px solid rgba(185, 28, 28, 0.2) !important;
 }
 
 body.light-theme .journey-unified-box {

@@ -22,15 +22,14 @@ export default function ContactMessageForm() {
       } else {
         setStatus({
           type: 'error',
-          text: res.message || 'Please enter at least 5 characters in your message.'
+          text: res?.message || 'Please enter at least 5 characters in your message.'
         });
       }
     } catch (err) {
       setStatus({
-        type: 'success',
-        text: `Thank you ${formData.name}! Your message has been recorded and sent to Jeseena.`
+        type: 'error',
+        text: err.message || 'Unable to save your message. Please check your connection or reach out directly via email.'
       });
-      setFormData({ name: '', email: '', subject: '', message: '' });
     } finally {
       setLoading(false);
     }

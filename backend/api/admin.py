@@ -1,4 +1,7 @@
+import urllib.parse
 from django.contrib import admin, messages
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -714,15 +717,100 @@ class ContactMessageAdmin(VisibleEditActionMixin, NextRedirectAdminMixin, admin.
     list_display_links = ('name', 'email', 'subject')
     list_filter = ('is_read', 'created_at')
     search_fields = ('name', 'email', 'subject', 'message')
-    readonly_fields = ('name', 'email', 'subject', 'message', 'created_at')
+    readonly_fields = ('name', 'email', 'reply_by_email', 'subject', 'created_at', 'message', 'full_message')
     list_editable = ('is_read',)
     ordering = ('-created_at',)
     actions = ['mark_as_read', 'mark_as_unread']
     fieldsets = (
-        ('Contact Message Information', {
-            'fields': ('name', 'email', 'subject', 'message', 'created_at', 'is_read')
+        ('Sender & Submission Details', {
+            'description': 'Contact details and timestamp of the visitor who submitted this inquiry via your portfolio.',
+            'fields': ('name', 'email', 'reply_by_email', 'subject', 'created_at', 'is_read')
+        }),
+        ('Full Message Content', {
+            'description': 'Complete, unedited message submitted by the sender.',
+            'fields': ('full_message',)
         }),
     )
+
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return ('name', 'email', 'reply_by_email', 'subject', 'created_at', 'message', 'full_message')
+
+    def reply_by_email(self, obj):
+        """
+        Renders a clearly labelled 'Reply by Email' button on the message detail page.
+        When clicked, opens the user's default email application with the sender's email
+        address filled into the recipient field.
+        Safely handles missing or invalid email addresses.
+        Does NOT send emails automatically.
+        """
+        if not obj or not obj.email or not str(obj.email).strip():
+            return format_html(
+                '<span style="color: #a1a1aa; font-style: italic; display: inline-flex; '
+                'align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; '
+                'background: var(--darkened-bg, #18181c); border: 1px dashed var(--border-color, #3f3f46); '
+                'border-radius: 4px; font-size: 0.85rem;">'
+                '⚠️ No email address provided'
+                '</span>'
+            )
+
+        raw_email = str(obj.email).strip()
+        try:
+            validate_email(raw_email)
+        except ValidationError:
+            return format_html(
+                '<span style="color: #fca5a5; font-size: 0.85rem; display: inline-flex; '
+                'align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; '
+                'background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 4px;">'
+                '⚠️ Cannot reply: Invalid email address (<code>{}</code>)'
+                '</span>',
+                raw_email
+            )
+
+        # Encode recipient and subject safely for mailto URI (preserve @ and + in email)
+        safe_recipient = urllib.parse.quote(raw_email, safe='@+')
+        subject_line = f"Re: {obj.subject.strip()}" if obj.subject and str(obj.subject).strip() else "Portfolio Contact Message"
+        safe_subject = urllib.parse.quote(subject_line)
+        mailto_url = f"mailto:{safe_recipient}?subject={safe_subject}"
+
+        return format_html(
+            '<div style="display: inline-flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">'
+            '<a href="{}" class="button btn-reply-email" '
+            'style="background: linear-gradient(135deg, #d32f2f, #991b1b) !important; '
+            'color: #ffffff !important; padding: 0.45rem 1.1rem !important; border-radius: 4px !important; '
+            'font-weight: 600 !important; font-size: 0.84rem !important; text-decoration: none !important; '
+            'letter-spacing: 0.03em !important; display: inline-flex !important; align-items: center !important; '
+            'gap: 0.5rem !important; box-shadow: 0 2px 8px rgba(211, 47, 47, 0.35) !important; '
+            'border: 1px solid #ef4444 !important; transition: all 0.2s ease !important;" '
+            'title="Open default email application to reply to {}">'
+            '<svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24">'
+            '<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>'
+            '</svg>'
+            '<span>Reply by Email</span>'
+            '</a>'
+            '<span style="color: var(--body-quiet-color, #a1a1aa); font-size: 0.8rem;">'
+            'Opens default email app to reply to <strong>{}</strong>'
+            '</span>'
+            '</div>',
+            mailto_url,
+            raw_email,
+            raw_email
+        )
+    reply_by_email.short_description = "Reply by Email"
+
+    def full_message(self, obj):
+        if not obj or not obj.message:
+            return format_html('<span style="color: #a1a1aa; font-style: italic;">(Empty message)</span>')
+        return format_html(
+            '<div style="max-width: 850px; padding: 1.1rem 1.35rem; '
+            'background: var(--darkened-bg, #121216); border: 1px solid var(--border-color, #27272a); '
+            'border-left: 4px solid #d32f2f; border-radius: 6px; white-space: pre-wrap; word-break: break-word; '
+            'font-size: 0.95rem; line-height: 1.65; color: var(--body-fg, inherit); font-family: inherit;">{}</div>',
+            obj.message
+        )
+    full_message.short_description = "Complete Message"
 
     def mark_as_read(self, request, queryset):
         rows = queryset.update(is_read=True)
