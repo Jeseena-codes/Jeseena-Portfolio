@@ -177,26 +177,55 @@ class ContactMessageCreateView(APIView):
             # Attempt to send notification email (non-blocking: DB save is retained if email fails)
             email_sent = False
             recipient = (
-                getattr(settings, 'CONTACT_NOTIFICATION_EMAIL', None)
-                or getattr(settings, 'EMAIL_HOST_USER', None)
-                or 'jeseena2005@gmail.com'
-            )
-            email_user = getattr(settings, 'EMAIL_HOST_USER', None)
-            email_pwd = getattr(settings, 'EMAIL_HOST_PASSWORD', None)
+                getattr(settings, 'CONTACT_NOTIFICATION_EMAIL', '')
+                or getattr(settings, 'EMAIL_HOST_USER', '')
+            ).strip()
+            from_email = (
+                getattr(settings, 'DEFAULT_FROM_EMAIL', '')
+                or getattr(settings, 'EMAIL_HOST_USER', '')
+            ).strip()
 
-            if email_user and email_pwd:
+            backend_name = getattr(settings, 'EMAIL_BACKEND', '') or ''
+            is_smtp = 'smtp' in backend_name.lower()
+            email_host = (getattr(settings, 'EMAIL_HOST', '') or '').strip()
+
+            if not recipient:
+                logger.warning(
+                    "Email notification skipped for contact message ID %s: CONTACT_NOTIFICATION_EMAIL is not configured.",
+                    message.id
+                )
+            elif not from_email:
+                logger.warning(
+                    "Email notification skipped for contact message ID %s: DEFAULT_FROM_EMAIL or EMAIL_HOST_USER is not configured.",
+                    message.id
+                )
+            elif is_smtp and not email_host:
+                logger.warning(
+                    "Email notification skipped for contact message ID %s: EMAIL_HOST is not configured.",
+                    message.id
+                )
+            else:
                 try:
-                    subject = f"[Portfolio Contact] New message from {message.name}: {message.subject}"
-                    timestamp = message.created_at.strftime('%Y-%m-%d %H:%M:%S UTC') if message.created_at else 'Just now'
+                    clean_name = " ".join((message.name or "").splitlines()).strip()
+                    clean_subject = " ".join((message.subject or "").splitlines()).strip()
+                    subject_line = f"[Portfolio Contact] New message from {clean_name}"
+                    if clean_subject:
+                        subject_line += f": {clean_subject}"
+
+                    timestamp = (
+                        message.created_at.strftime('%Y-%m-%d %H:%M:%S UTC')
+                        if message.created_at
+                        else 'Just now'
+                    )
                     body = (
                         f"You have received a new contact inquiry through your portfolio website.\n\n"
                         f"--------------------------------------------------\n"
                         f"SENDER DETAILS:\n"
-                        f"• Name:       {message.name}\n"
+                        f"• Name:       {clean_name}\n"
                         f"• Email:      {message.email}\n"
-                        f"• Subject:    {message.subject}\n"
+                        f"• Subject:    {clean_subject}\n"
                         f"• Received:   {timestamp}\n"
-                        f"• Status:     Unread (New)\n\n"
+                        f"• Message ID: {message.id}\n\n"
                         f"--------------------------------------------------\n"
                         f"MESSAGE CONTENT:\n"
                         f"{message.message}\n\n"
@@ -204,23 +233,27 @@ class ContactMessageCreateView(APIView):
                         f"You can view, read, and manage this message in your Django Admin Inbox:\n"
                         f"/admin/api/contactmessage/{message.id}/change/\n"
                     )
-                    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or email_user
+
                     send_mail(
-                        subject=subject,
+                        subject=subject_line,
                         message=body,
                         from_email=from_email,
                         recipient_list=[recipient],
                         fail_silently=False,
                     )
                     email_sent = True
-                    logger.info("Notification email dispatched successfully for contact message ID %s", message.id)
+                    logger.info(
+                        "Notification email dispatched successfully for contact message ID %s to %s",
+                        message.id,
+                        recipient
+                    )
                 except Exception as mail_exc:
-                    logger.error("Failed to dispatch notification email for message ID %s: %s", message.id, str(mail_exc))
-            else:
-                logger.info(
-                    "Email notification skipped for message ID %s: EMAIL_HOST_USER / EMAIL_HOST_PASSWORD not configured.",
-                    message.id
-                )
+                    email_sent = False
+                    logger.error(
+                        "Failed to dispatch notification email for contact message ID %s: %s",
+                        message.id,
+                        mail_exc
+                    )
 
             return Response({
                 'success': True,

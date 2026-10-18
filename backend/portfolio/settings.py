@@ -151,17 +151,23 @@ else:
         print(f"[Django Database] Target: LOCAL (SQLite fallback: db.sqlite3)")
 
 
-# Email Configuration (Environment Variables for Render / Production Deployment)
+# Email Configuration (SMTP configured entirely via Environment Variables)
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 't', 'yes')
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 't', 'yes')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+try:
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587') or 587)
+except ValueError:
+    EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', os.environ.get('EMAIL_HOST_USER', 'jeseena2005@gmail.com'))
-CONTACT_NOTIFICATION_EMAIL = os.environ.get('CONTACT_NOTIFICATION_EMAIL', os.environ.get('EMAIL_HOST_USER', 'jeseena2005@gmail.com'))
-EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', 10))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').strip().lower() in ('true', '1', 't', 'yes')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').strip().lower() in ('true', '1', 't', 'yes')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', '') or EMAIL_HOST_USER
+CONTACT_NOTIFICATION_EMAIL = os.environ.get('CONTACT_NOTIFICATION_EMAIL', '') or EMAIL_HOST_USER
+try:
+    EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', '10') or 10)
+except ValueError:
+    EMAIL_TIMEOUT = 10
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
