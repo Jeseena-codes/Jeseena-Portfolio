@@ -250,9 +250,13 @@ class ContactMessageCreateView(APIView):
                 except Exception as mail_exc:
                     email_sent = False
                     logger.error(
-                        "Failed to dispatch notification email for contact message ID %s: %s",
+                        "Failed to dispatch notification email for contact message ID %s via SMTP (%s:%s): [%s] %s",
                         message.id,
-                        mail_exc
+                        getattr(settings, 'EMAIL_HOST', ''),
+                        getattr(settings, 'EMAIL_PORT', ''),
+                        mail_exc.__class__.__name__,
+                        mail_exc,
+                        exc_info=True
                     )
 
             return Response({

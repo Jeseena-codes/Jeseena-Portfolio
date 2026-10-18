@@ -160,14 +160,54 @@ except ValueError:
     EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').strip().lower() in ('true', '1', 't', 'yes')
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').strip().lower() in ('true', '1', 't', 'yes')
+
+# Handle TLS / SSL safely to prevent mutually exclusive ValueError
+raw_ssl = os.environ.get('EMAIL_USE_SSL', '').strip().lower()
+raw_tls = os.environ.get('EMAIL_USE_TLS', '').strip().lower()
+
+if raw_ssl in ('true', '1', 't', 'yes') or (EMAIL_PORT == 465 and raw_tls not in ('true', '1', 't', 'yes')):
+    EMAIL_USE_SSL = True
+    EMAIL_USE_TLS = False
+else:
+    EMAIL_USE_SSL = False
+    EMAIL_USE_TLS = raw_tls not in ('false', '0', 'f', 'no')  # defaults to True for port 587
+
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', '') or EMAIL_HOST_USER
 CONTACT_NOTIFICATION_EMAIL = os.environ.get('CONTACT_NOTIFICATION_EMAIL', '') or EMAIL_HOST_USER
 try:
     EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', '10') or 10)
 except ValueError:
     EMAIL_TIMEOUT = 10
+
+# Logging Configuration: ensures server logs appear in Render log streams
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[%(asctime)s] %(levelname)s [%(name)s]: %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'api': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'portfolio': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
